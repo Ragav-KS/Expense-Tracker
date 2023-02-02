@@ -1,7 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
+
+  namespace 'com.ragav.expensetracker'
+  compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.ragav.expensetracker"
         minSdkVersion rootProject.ext.minSdkVersion
