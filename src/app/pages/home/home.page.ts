@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { gmailApi } from 'src/app/plugins/GmailAPI';
+import credentials from 'src/res/credentials.json';
 
 @Component({
   selector: 'app-home',
@@ -10,8 +11,13 @@ export class HomePage implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    console.log();
+
     gmailApi
-      .initialize({ androidClientID: 'Android test', webClientID: 'Web test' })
+      .initialize({
+        androidClientID: credentials.androidClientID,
+        webClientID: credentials.webClientID,
+      })
       .then((result) => {
         console.log(result);
       });
