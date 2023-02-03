@@ -1,5 +1,16 @@
 package com.ragav.expensetracker;
 
-import com.getcapacitor.BridgeActivity;
+import android.os.Bundle;
 
-public class MainActivity extends BridgeActivity {}
+import com.getcapacitor.BridgeActivity;
+import com.ragav.expensetracker.plugins.gmailApi.GmailApiPlugin;
+
+public class MainActivity extends BridgeActivity {
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    registerPlugin(GmailApiPlugin.class);
+    super.onCreate(savedInstanceState);
+
+  }
+}
