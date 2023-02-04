@@ -29,6 +29,7 @@ import java.util.List;
 public class GmailApi {
 
   private final NetHttpTransport HTTP_TRANSPORT;
+  private AsyncTask<Void, Void, Void> getTokenTask;
   private String token = null;
   private GoogleAccountCredential mCredential;
   private Activity activity;
@@ -51,6 +52,21 @@ public class GmailApi {
       .usingOAuth2(context.getApplicationContext(), SCOPES)
       .setBackOff(new ExponentialBackOff());
 
+    getTokenTask = new AsyncTask<>() {
+      @Override
+      protected Void doInBackground(Void... voids) {
+        try {
+          token = mCredential.getToken();
+        } catch (UserRecoverableAuthException e) {
+          authorisationActivityLauncher.launch(e.getIntent());
+        } catch (GoogleAuthException | IOException e) {
+          throw new RuntimeException(e);
+        }
+
+        return null;
+      }
+    };
+
     authorisationActivityLauncher = ((ComponentActivity) activity).registerForActivityResult(
       new ActivityResultContracts.StartActivityForResult(),
       result -> {
@@ -67,26 +83,12 @@ public class GmailApi {
           if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
 
-            String accountName;
             if (data != null) {
-              accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+              String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+
               mCredential.setSelectedAccountName(accountName);
 
-              new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                  try {
-                    token = mCredential.getToken();
-                  } catch (UserRecoverableAuthException e) {
-                    authorisationActivityLauncher.launch(e.getIntent());
-                  } catch (GoogleAuthException | IOException e) {
-                    throw new RuntimeException(e);
-                  }
-
-                  return null;
-                }
-              }.execute();
-
+              getTokenTask.execute();
             }
           }
         });
