@@ -6,6 +6,9 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 @CapacitorPlugin(name = "gmailAPI")
 public class GmailApiPlugin extends Plugin {
 
@@ -14,7 +17,14 @@ public class GmailApiPlugin extends Plugin {
   @Override
   public void load() {
     super.load();
-    implementation = new GmailApi(getActivity(), getContext());
+
+    try {
+      implementation = new GmailApi(getActivity(), getContext());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+
   }
 
   @PluginMethod()
@@ -26,4 +36,20 @@ public class GmailApiPlugin extends Plugin {
     ret.put("success", true);
     call.resolve(ret);
   }
+
+  @PluginMethod()
+  public void loadToken(PluginCall call) {
+    implementation.loadToken();
+
+    call.resolve();
+  }
+  @PluginMethod
+  public void getToken(PluginCall call) {
+    String token = implementation.getToken();
+
+    JSObject ret = new JSObject();
+    ret.put("token", token);
+    call.resolve(ret);
+  }
+
 }
