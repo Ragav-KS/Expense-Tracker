@@ -3,4 +3,8 @@ export interface GmailApiPlugin {
     webClientID: string;
     androidClientID: string;
   }): Promise<{ success: boolean }>;
+
+  loadToken(): Promise<void>;
+
+  getToken(): Promise<{ token: string }>;
 }

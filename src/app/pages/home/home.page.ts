@@ -22,4 +22,16 @@ export class HomePage implements OnInit {
         console.log(result);
       });
   }
+
+  handleLogin() {
+    console.log('test');
+
+    gmailApi.loadToken();
+  }
+
+  handleGetToken() {
+    gmailApi.getToken().then((result) => {
+      console.log(result);
+    });
+  }
 }
