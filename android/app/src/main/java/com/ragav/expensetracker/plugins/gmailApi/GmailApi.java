@@ -1,5 +1,6 @@
 package com.ragav.expensetracker.plugins.gmailApi;
 
+import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -8,13 +9,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import androidx.activity.ComponentActivity;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -51,7 +51,6 @@ public class GmailApi {
       .usingOAuth2(context.getApplicationContext(), SCOPES)
       .setBackOff(new ExponentialBackOff());
 
-
     authorisationActivityLauncher = ((ComponentActivity) activity).registerForActivityResult(
       new ActivityResultContracts.StartActivityForResult(),
       result -> {
@@ -71,7 +70,6 @@ public class GmailApi {
             String accountName;
             if (data != null) {
               accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-
               mCredential.setSelectedAccountName(accountName);
 
               new AsyncTask<Void, Void, Void>() {
@@ -80,7 +78,6 @@ public class GmailApi {
                   try {
                     token = mCredential.getToken();
                   } catch (UserRecoverableAuthException e) {
-                    // TODO: check consent screen process
                     authorisationActivityLauncher.launch(e.getIntent());
                   } catch (GoogleAuthException | IOException e) {
                     throw new RuntimeException(e);
