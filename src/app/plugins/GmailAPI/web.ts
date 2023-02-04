@@ -8,6 +8,8 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
   private scopes!: string;
   private discoveryDoc!: string;
 
+  private selectedAccount!: string;
+
   access_token!: string;
 
   constructor() {
@@ -15,10 +17,13 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
   }
 
   async initialize(options: {
+    selectedAccount?: string;
     webClientID: string;
     androidClientID: string;
   }): Promise<{ success: boolean }> {
     this.clientId = options.webClientID;
+    this.selectedAccount = options.selectedAccount!;
+
     this.scopes = 'https://www.googleapis.com/auth/gmail.readonly';
     this.discoveryDoc =
       'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
@@ -59,7 +64,9 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
   };
 
   async loadToken(): Promise<void> {
-    this.tokenClient.requestAccessToken();
+    this.tokenClient.requestAccessToken({
+      hint: this.selectedAccount,
+    });
   }
 
   async getToken(): Promise<{ token: string }> {

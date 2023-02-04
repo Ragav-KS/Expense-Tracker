@@ -15,6 +15,7 @@ export class HomePage implements OnInit {
 
     gmailApi
       .initialize({
+        selectedAccount: 'your_gmailId@gmail.com',
         androidClientID: credentials.androidClientID,
         webClientID: credentials.webClientID,
       })
@@ -24,8 +25,6 @@ export class HomePage implements OnInit {
   }
 
   handleLogin() {
-    console.log('test');
-
     gmailApi.loadToken();
   }
 
