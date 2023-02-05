@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { gmailApi } from 'src/app/plugins/GmailAPI';
+import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import credentials from 'src/res/credentials.json';
 
@@ -19,7 +19,7 @@ export class HomePage implements OnInit {
     this.gmailSrv.loadToken();
   }
 
-  handleGetToken() {
-    // this.gmailSrv.getToken();
+  handlefetchMails() {
+    this.gmailSrv.fetchMails();
   }
 }

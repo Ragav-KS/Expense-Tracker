@@ -24,7 +24,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
-public class GmailApi {
+public class GoogleAuth {
 
   private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
   private final NetHttpTransport HTTP_TRANSPORT;
@@ -37,7 +37,7 @@ public class GmailApi {
 
   // TODO: fix static field leak
   @SuppressLint("StaticFieldLeak")
-  public GmailApi(Activity activity, Context context) throws GeneralSecurityException, IOException {
+  public GoogleAuth(Activity activity, Context context) throws GeneralSecurityException, IOException {
     this.activity = activity;
     this.context = context;
 
@@ -69,7 +69,7 @@ public class GmailApi {
 
               mCredential.setSelectedAccountName(accountName);
 
-              synchronized (GmailApi.this) {
+              synchronized (GoogleAuth.this) {
                 notify();
               }
             }
@@ -110,8 +110,8 @@ public class GmailApi {
         throw new RuntimeException(e);
       }
 
-      synchronized (GmailApi.this) {
-        GmailApi.this.notify();
+      synchronized (GoogleAuth.this) {
+        GoogleAuth.this.notify();
       }
 
       return null;

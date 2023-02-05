@@ -1,9 +1,8 @@
 import { EventEmitter } from '@angular/core';
 import { WebPlugin } from '@capacitor/core';
-// import { EventEmitter } from 'stream';
-import type { GmailApiPlugin } from './definitions';
+import type { GoogleAuthPlugin } from './definitions';
 
-export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
+export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
   private tokenClient!: google.accounts.oauth2.TokenClient;
 
   private clientId!: string;
