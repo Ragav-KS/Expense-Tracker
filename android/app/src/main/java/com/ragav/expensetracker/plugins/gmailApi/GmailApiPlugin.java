@@ -6,13 +6,10 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
 @CapacitorPlugin(name = "gmailAPI")
 public class GmailApiPlugin extends Plugin {
 
-  private  GmailApi implementation;
+  private GmailApi implementation;
 
   @Override
   public void load() {
@@ -37,12 +34,6 @@ public class GmailApiPlugin extends Plugin {
     call.resolve(ret);
   }
 
-  @PluginMethod()
-  public void loadToken(PluginCall call) {
-    implementation.loadToken();
-
-    call.resolve();
-  }
   @PluginMethod
   public void getToken(PluginCall call) {
     String token = implementation.getToken();

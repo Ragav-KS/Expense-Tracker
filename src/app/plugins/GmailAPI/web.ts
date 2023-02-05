@@ -1,16 +1,21 @@
+import { EventEmitter } from '@angular/core';
 import { WebPlugin } from '@capacitor/core';
+// import { EventEmitter } from 'stream';
 import type { GmailApiPlugin } from './definitions';
 
 export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
   private tokenClient!: google.accounts.oauth2.TokenClient;
 
   private clientId!: string;
+
   private scopes!: string;
   private discoveryDoc!: string;
 
   private selectedAccount!: string;
 
   access_token!: string;
+
+  private accessTokenEmitter!: EventEmitter<string>;
 
   constructor() {
     super();
@@ -28,6 +33,8 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
     this.discoveryDoc =
       'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
 
+    this.accessTokenEmitter = new EventEmitter();
+
     this.gisInitialize();
     this.gapiLoadClient();
 
@@ -39,9 +46,7 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
       client_id: this.clientId,
       scope: this.scopes,
       callback: (tokenResponse) => {
-        console.log('got access token');
-
-        this.access_token = tokenResponse.access_token;
+        this.accessTokenEmitter.emit(tokenResponse.access_token);
       },
     });
   }
@@ -63,13 +68,19 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
       });
   };
 
-  async loadToken(): Promise<void> {
+  async getToken(): Promise<{ token: string }> {
     this.tokenClient.requestAccessToken({
       hint: this.selectedAccount,
     });
-  }
 
-  async getToken(): Promise<{ token: string }> {
-    return { token: this.access_token };
+    return new Promise((resolve, reject) => {
+      this.accessTokenEmitter.subscribe((token) => {
+        this.access_token = token;
+
+        resolve({
+          token: this.access_token,
+        });
+      });
+    });
   }
 }
