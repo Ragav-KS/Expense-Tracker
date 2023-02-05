@@ -6,6 +6,7 @@
     "types": [
       "gapi",
       "gapi.auth2",
+      "gapi.client.gmail-v1",
       "google.accounts"
     ]
   },

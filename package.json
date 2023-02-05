@@ -28,6 +28,7 @@
     "@ionic/angular": "^6.1.9",
     "@types/gapi": "^0.0.44",
     "@types/gapi.auth2": "^0.0.57",
+    "@types/gapi.client.gmail-v1": "^0.0.0",
     "@types/google.accounts": "^0.0.5",
     "ionicons": "^6.0.3",
     "rxjs": "~7.5.0",
