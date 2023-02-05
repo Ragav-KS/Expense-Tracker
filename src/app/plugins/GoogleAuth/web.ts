@@ -8,7 +8,6 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
   private clientId!: string;
 
   private scopes!: string;
-  private discoveryDoc!: string;
 
   private selectedAccount!: string;
 
@@ -29,13 +28,10 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     this.selectedAccount = options.selectedAccount!;
 
     this.scopes = 'https://www.googleapis.com/auth/gmail.readonly';
-    this.discoveryDoc =
-      'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
 
     this.accessTokenEmitter = new EventEmitter();
 
     this.gisInitialize();
-    this.gapiLoadClient();
 
     return { success: true };
   }
@@ -49,23 +45,6 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
       },
     });
   }
-
-  private gapiLoadClient() {
-    gapi.load('client', this.gapiClientInit);
-  }
-
-  private gapiClientInit = () => {
-    gapi.client
-      .init({
-        discoveryDocs: [this.discoveryDoc],
-      })
-      .then(() => {
-        console.log('gapi client load success');
-      })
-      .catch((err) => {
-        new Error('gapi client load failed.');
-      });
-  };
 
   async getToken(): Promise<{ token: string }> {
     this.tokenClient.requestAccessToken({

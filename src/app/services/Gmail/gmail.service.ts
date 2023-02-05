@@ -6,6 +6,9 @@ import credentials from 'src/res/credentials.json';
   providedIn: 'root',
 })
 export class GmailService {
+  private discoveryDoc: string =
+    'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
+
   private accessToken!: string;
 
   constructor() {
@@ -27,9 +30,7 @@ export class GmailService {
   private gapiClientInit = () => {
     gapi.client
       .init({
-        discoveryDocs: [
-          'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest',
-        ],
+        discoveryDocs: [this.discoveryDoc],
       })
       .then(() => {
         console.log('gapi client load success');
@@ -39,7 +40,6 @@ export class GmailService {
       });
   };
 
-  // TODO: synchronize loadToken and return it.
   async loadToken() {
     await GoogleAuth.getToken().then((result) => {
       this.accessToken = result.token;
