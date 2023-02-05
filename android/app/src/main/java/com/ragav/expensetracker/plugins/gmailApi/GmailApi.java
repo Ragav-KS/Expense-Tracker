@@ -1,6 +1,5 @@
 package com.ragav.expensetracker.plugins.gmailApi;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -28,17 +26,14 @@ import java.util.List;
 
 public class GmailApi {
 
+  private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
   private final NetHttpTransport HTTP_TRANSPORT;
-  private AsyncTask<Void, Void, Void> getTokenTask;
-  private String token = null;
-  private GoogleAccountCredential mCredential;
-  private Activity activity;
-  private Context context;
-
   private final ActivityResultLauncher<Intent> chooseAccountActivityLauncher;
   private final ActivityResultLauncher<Intent> authorisationActivityLauncher;
-
-  private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
+  private final GoogleAccountCredential mCredential;
+  private final Activity activity;
+  private final Context context;
+  private String token = null;
 
   // TODO: fix static field leak
   @SuppressLint("StaticFieldLeak")
@@ -52,27 +47,13 @@ public class GmailApi {
       .usingOAuth2(context.getApplicationContext(), SCOPES)
       .setBackOff(new ExponentialBackOff());
 
-    getTokenTask = new AsyncTask<>() {
-      @Override
-      protected Void doInBackground(Void... voids) {
-        try {
-          token = mCredential.getToken();
-        } catch (UserRecoverableAuthException e) {
-          authorisationActivityLauncher.launch(e.getIntent());
-        } catch (GoogleAuthException | IOException e) {
-          throw new RuntimeException(e);
-        }
-
-        return null;
-      }
-    };
-
     authorisationActivityLauncher = ((ComponentActivity) activity).registerForActivityResult(
       new ActivityResultContracts.StartActivityForResult(),
       result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
           Intent data = result.getData();
-          System.out.println(data);
+
+          new GetTokenTask().execute();
         }
       });
 
@@ -88,17 +69,53 @@ public class GmailApi {
 
               mCredential.setSelectedAccountName(accountName);
 
-              getTokenTask.execute();
+              synchronized (GmailApi.this) {
+                notify();
+              }
             }
           }
         });
+
   }
 
-  public void loadToken() {
+  public synchronized String getToken() {
     chooseAccountActivityLauncher.launch(mCredential.newChooseAccountIntent());
-  }
 
-  public String getToken() {
+    try {
+      this.wait();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    new GetTokenTask().execute();
+
+    try {
+      this.wait();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
     return token;
   }
+
+  class GetTokenTask extends AsyncTask {
+    @Override
+    protected Object doInBackground(Object[] objects) {
+      try {
+        token = mCredential.getToken();
+      } catch (UserRecoverableAuthException e) {
+        authorisationActivityLauncher.launch(e.getIntent());
+        return null;
+      } catch (GoogleAuthException | IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      synchronized (GmailApi.this) {
+        GmailApi.this.notify();
+      }
+
+      return null;
+    }
+  }
+
 }

@@ -25,12 +25,11 @@ export class HomePage implements OnInit {
   }
 
   handleLogin() {
-    gmailApi.loadToken();
-  }
-
-  handleGetToken() {
     gmailApi.getToken().then((result) => {
       console.log(result);
+      alert(result.token);
     });
   }
+
+  handleGetToken() {}
 }
