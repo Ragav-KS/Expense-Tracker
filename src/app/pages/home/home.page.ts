@@ -16,10 +16,14 @@ export class HomePage implements OnInit {
   }
 
   handleLogin() {
-    this.gmailSrv.loadToken();
+    this.gmailSrv.loadToken().then((result) => {
+      console.log(result);
+    });
   }
 
   handlefetchMails() {
-    this.gmailSrv.fetchMails();
+    this.gmailSrv.fetchMails().then((result) => {
+      console.log(result);
+    });
   }
 }

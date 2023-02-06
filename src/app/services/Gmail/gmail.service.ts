@@ -13,34 +13,29 @@ export class GmailService {
 
   constructor() {
     GoogleAuth.initialize({
-      // selectedAccount: 'your_gmailId@gmail.com',
       androidClientID: credentials.androidClientID,
       webClientID: credentials.webClientID,
-    }).then((result) => {
-      console.log(result);
     });
 
     this.gapiLoadClient();
   }
 
   private gapiLoadClient() {
-    gapi.load('client', this.gapiClientInit);
+    gapi.load('client', () => {
+      gapi.client
+        .init({
+          discoveryDocs: [this.discoveryDoc],
+        })
+        .then(() => {
+          console.log('gapi client load success');
+        })
+        .catch((err) => {
+          new Error('gapi client load failed.');
+        });
+    });
   }
 
-  private gapiClientInit = () => {
-    gapi.client
-      .init({
-        discoveryDocs: [this.discoveryDoc],
-      })
-      .then(() => {
-        console.log('gapi client load success');
-      })
-      .catch((err) => {
-        new Error('gapi client load failed.');
-      });
-  };
-
-  async loadToken() {
+  public async loadToken(account?: string): Promise<string> {
     await GoogleAuth.getToken().then((result) => {
       this.accessToken = result.token;
     });
@@ -49,17 +44,31 @@ export class GmailService {
       access_token: this.accessToken,
     });
 
-    alert(this.accessToken);
+    let selectedUserID!: string;
+    await gapi.client.gmail.users
+      .getProfile({ userId: 'me' })
+      .then((res) => {
+        selectedUserID = res.result.emailAddress!;
+      })
+      .catch((err) => {
+        throw new Error('Failed to fetch user profile.');
+      });
+
+    return selectedUserID;
   }
 
-  async fetchMails() {
+  public async fetchMails(
+    userId: string = 'me',
+    labelIds?: string[],
+    query?: string
+  ): Promise<gapi.client.gmail.ListMessagesResponse> {
     let response!: gapi.client.Response<gapi.client.gmail.ListMessagesResponse>;
 
     await gapi.client.gmail.users.messages
       .list({
-        userId: 'me',
-        // labelIds: options.labelIds,
-        // q: options.query,
+        userId: userId,
+        labelIds: labelIds,
+        q: query,
       })
       .then((res) => {
         response = res;
@@ -68,6 +77,6 @@ export class GmailService {
         throw new Error('Failed to fetch messages.');
       });
 
-    console.log(response);
+    return response.result;
   }
 }
