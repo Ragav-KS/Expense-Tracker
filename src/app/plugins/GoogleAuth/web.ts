@@ -1,15 +1,13 @@
 import { EventEmitter } from '@angular/core';
 import { WebPlugin } from '@capacitor/core';
-// import { EventEmitter } from 'stream';
-import type { GmailApiPlugin } from './definitions';
+import type { GoogleAuthPlugin } from './definitions';
 
-export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
+export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
   private tokenClient!: google.accounts.oauth2.TokenClient;
 
   private clientId!: string;
 
   private scopes!: string;
-  private discoveryDoc!: string;
 
   private selectedAccount!: string;
 
@@ -30,13 +28,10 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
     this.selectedAccount = options.selectedAccount!;
 
     this.scopes = 'https://www.googleapis.com/auth/gmail.readonly';
-    this.discoveryDoc =
-      'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
 
     this.accessTokenEmitter = new EventEmitter();
 
     this.gisInitialize();
-    this.gapiLoadClient();
 
     return { success: true };
   }
@@ -50,23 +45,6 @@ export class GmailApiWeb extends WebPlugin implements GmailApiPlugin {
       },
     });
   }
-
-  private gapiLoadClient() {
-    gapi.load('client', this.gapiClientInit);
-  }
-
-  private gapiClientInit = () => {
-    gapi.client
-      .init({
-        discoveryDocs: [this.discoveryDoc],
-      })
-      .then(() => {
-        console.log('gapi client load success');
-      })
-      .catch((err) => {
-        new Error('gapi client load failed.');
-      });
-  };
 
   async getToken(): Promise<{ token: string }> {
     this.tokenClient.requestAccessToken({

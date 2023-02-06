@@ -1,4 +1,4 @@
-export interface GmailApiPlugin {
+export interface GoogleAuthPlugin {
   initialize(options: {
     selectedAccount?: string;
     webClientID: string;

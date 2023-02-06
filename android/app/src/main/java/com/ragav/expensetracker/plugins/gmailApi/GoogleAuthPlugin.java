@@ -6,21 +6,20 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-@CapacitorPlugin(name = "gmailAPI")
-public class GmailApiPlugin extends Plugin {
+@CapacitorPlugin(name = "GoogleAuth")
+public class GoogleAuthPlugin extends Plugin {
 
-  private GmailApi implementation;
+  private GoogleAuth implementation;
 
   @Override
   public void load() {
     super.load();
 
     try {
-      implementation = new GmailApi(getActivity(), getContext());
+      implementation = new GoogleAuth(getActivity(), getContext());
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
 
   }
 
