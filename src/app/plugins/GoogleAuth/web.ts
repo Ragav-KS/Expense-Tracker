@@ -3,15 +3,12 @@ import { WebPlugin } from '@capacitor/core';
 import type { GoogleAuthPlugin } from './definitions';
 
 export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
+  private scopes: string = 'https://www.googleapis.com/auth/gmail.readonly';
+
   private tokenClient!: google.accounts.oauth2.TokenClient;
 
   private clientId!: string;
-
-  private scopes!: string;
-
-  private selectedAccount!: string;
-
-  access_token!: string;
+  private access_token!: string;
 
   private accessTokenEmitter!: EventEmitter<string>;
 
@@ -20,20 +17,14 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
   }
 
   async initialize(options: {
-    selectedAccount?: string;
     webClientID: string;
     androidClientID: string;
-  }): Promise<{ success: boolean }> {
+  }): Promise<void> {
     this.clientId = options.webClientID;
-    this.selectedAccount = options.selectedAccount!;
-
-    this.scopes = 'https://www.googleapis.com/auth/gmail.readonly';
 
     this.accessTokenEmitter = new EventEmitter();
 
     this.gisInitialize();
-
-    return { success: true };
   }
 
   private gisInitialize() {
@@ -46,9 +37,11 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     });
   }
 
-  async getToken(): Promise<{ token: string }> {
+  async getToken(options: {
+    selectedAccount?: string;
+  }): Promise<{ token: string }> {
     this.tokenClient.requestAccessToken({
-      hint: this.selectedAccount,
+      hint: options.selectedAccount,
     });
 
     return new Promise((resolve, reject) => {

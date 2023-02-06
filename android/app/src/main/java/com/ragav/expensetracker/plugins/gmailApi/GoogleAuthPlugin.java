@@ -25,18 +25,22 @@ public class GoogleAuthPlugin extends Plugin {
 
   @PluginMethod()
   public void initialize(PluginCall call) {
-    String value = call.getString("androidClientID");
-    System.out.println(value);
+    // Params
+    String value = call.getString("androidClientID"); // Just realized that this thing works without ClientID 😐. Will decide later what to do with this.
 
-    JSObject ret = new JSObject();
-    ret.put("success", true);
-    call.resolve(ret);
+    // Return
+    call.resolve();
   }
 
   @PluginMethod
   public void getToken(PluginCall call) {
-    String token = implementation.getToken();
+    // Params
+    String value = call.getString("selectedAccount", null);
 
+    // body
+    String token = implementation.getToken(value);
+
+    // Return
     JSObject ret = new JSObject();
     ret.put("token", token);
     call.resolve(ret);

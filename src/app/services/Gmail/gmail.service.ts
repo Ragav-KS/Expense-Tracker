@@ -36,7 +36,9 @@ export class GmailService {
   }
 
   public async loadToken(account?: string): Promise<string> {
-    await GoogleAuth.getToken().then((result) => {
+    await GoogleAuth.getToken({
+      selectedAccount: account,
+    }).then((result) => {
       this.accessToken = result.token;
     });
 

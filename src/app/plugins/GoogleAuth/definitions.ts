@@ -1,9 +1,8 @@
 export interface GoogleAuthPlugin {
   initialize(options: {
-    selectedAccount?: string;
     webClientID: string;
     androidClientID: string;
-  }): Promise<{ success: boolean }>;
+  }): Promise<void>;
 
-  getToken(): Promise<{ token: string }>;
+  getToken(options: { selectedAccount?: string }): Promise<{ token: string }>;
 }

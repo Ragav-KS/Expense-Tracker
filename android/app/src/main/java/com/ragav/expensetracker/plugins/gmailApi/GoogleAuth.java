@@ -78,13 +78,17 @@ public class GoogleAuth {
 
   }
 
-  public synchronized String getToken() {
-    chooseAccountActivityLauncher.launch(mCredential.newChooseAccountIntent());
+  public synchronized String getToken(String value) {
+    if (value != null) {
+      mCredential.setSelectedAccountName(value);
+    } else {
+      chooseAccountActivityLauncher.launch(mCredential.newChooseAccountIntent());
 
-    try {
-      this.wait();
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      try {
+        this.wait();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     new GetTokenTask().execute();
