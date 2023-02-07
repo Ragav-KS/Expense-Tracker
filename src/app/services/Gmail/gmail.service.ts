@@ -59,7 +59,7 @@ export class GmailService {
     return selectedUserID;
   }
 
-  public async fetchMails(
+  public async getMailsList(
     userId: string = 'me',
     labelIds?: string[],
     query?: string

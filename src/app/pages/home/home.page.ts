@@ -29,7 +29,7 @@ export class HomePage implements OnInit {
   }
 
   handlefetchMails() {
-    this.gmailSrv.fetchMails().then((result) => {
+    this.gmailSrv.getMailsList().then((result) => {
       console.log(result);
     });
   }
