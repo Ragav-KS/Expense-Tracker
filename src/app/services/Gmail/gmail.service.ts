@@ -76,7 +76,29 @@ export class GmailService {
         response = res;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch messages.');
+        throw new Error('Failed to fetch message list.');
+      });
+
+    return response.result;
+  }
+
+  public async getMail(
+    mailId: string,
+    userId: string = 'me'
+  ): Promise<gapi.client.gmail.Message> {
+    let response!: gapi.client.Response<gapi.client.gmail.Message>;
+
+    await gapi.client.gmail.users.messages
+      .get({
+        id: mailId,
+        userId: userId,
+        prettyPrint: true,
+      })
+      .then((res) => {
+        response = res;
+      })
+      .catch((err) => {
+        throw new Error('Failed to fetch message.');
       });
 
     return response.result;
