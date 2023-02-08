@@ -59,11 +59,15 @@ export class GmailService {
     return selectedUserID;
   }
 
-  public async getMailsList(
-    userId: string = 'me',
-    labelIds?: string[],
-    query?: string
-  ): Promise<gapi.client.gmail.ListMessagesResponse> {
+  public async getMailsList({
+    userId = 'me',
+    labelIds,
+    query,
+  }: {
+    userId?: string;
+    labelIds?: string[];
+    query?: string;
+  }): Promise<gapi.client.gmail.ListMessagesResponse> {
     let response!: gapi.client.Response<gapi.client.gmail.ListMessagesResponse>;
 
     await gapi.client.gmail.users.messages

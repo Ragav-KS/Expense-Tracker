@@ -30,7 +30,7 @@ export class HomePage implements OnInit {
 
   handlefetchMails() {
     this.gmailSrv
-      .getMailsList()
+      .getMailsList({})
       .then((result) => {
         console.log(result);
 
