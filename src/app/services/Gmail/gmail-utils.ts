@@ -1,9 +1,7 @@
 export class GmailUtils {
-  public static getContentFromMessage(message: gapi.client.gmail.Message): {
-    date: string;
-    subject: string;
-    body: string;
-  } {
+  public static async getContentFromMessage(
+    message: gapi.client.gmail.Message
+  ): Promise<{ date: string; subject: string; body: string }> {
     let headers = new Map();
     message.payload?.headers!.forEach((header) => {
       headers.set(header.name, header.value);
@@ -17,11 +15,15 @@ export class GmailUtils {
     let mime = payload.mimeType;
 
     let decodedBody: string;
+    let body: string;
     if (mime?.includes('multipart')) {
       let parts = payload.parts!;
-      let body = parts[0].body!.data!;
-      decodedBody = atob(body.replace(/-/g, '+').replace(/_/g, '/'));
+      body = parts[0].body!.data!;
+    } else {
+      body = payload.body!.data!;
     }
+
+    decodedBody = atob(body!.replace(/-/g, '+').replace(/_/g, '/'));
 
     return {
       date: mailDate,

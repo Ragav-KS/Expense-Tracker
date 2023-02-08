@@ -42,7 +42,9 @@ export class HomePage implements OnInit {
         return this.gmailSrv.getMail(mailId);
       })
       .then((result) => {
-        GmailUtils.getContentFromMessage(result);
+        return GmailUtils.getContentFromMessage(result);
+      })
+      .then((result) => {
         console.log(result);
       });
   }
