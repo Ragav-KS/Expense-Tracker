@@ -61,10 +61,12 @@ export class GmailService {
 
   public async getMailsList({
     userId = 'me',
+    pageToken,
     labelIds,
     query,
   }: {
     userId?: string;
+    pageToken?: string;
     labelIds?: string[];
     query?: string;
   }): Promise<gapi.client.gmail.ListMessagesResponse> {
@@ -75,6 +77,7 @@ export class GmailService {
         userId: userId,
         labelIds: labelIds,
         q: query,
+        pageToken: pageToken,
       })
       .then((res) => {
         response = res;
