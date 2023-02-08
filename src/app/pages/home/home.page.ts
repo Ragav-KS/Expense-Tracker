@@ -4,6 +4,7 @@ import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import credentials from 'src/res/credentials.json';
 import { Preferences } from '@capacitor/preferences';
 import { PreferenceStoreService } from 'src/app/services/PreferenceStore/preference-store.service';
+import { GmailUtils } from 'src/app/services/Gmail/gmail-utils';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,7 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log();
+    this.handleLogin();
   }
 
   async handleLogin() {
@@ -30,7 +31,9 @@ export class HomePage implements OnInit {
 
   handlefetchMails() {
     this.gmailSrv
-      .getMailsList({})
+      .getMailsList({
+        query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2021-01-01',
+      })
       .then((result) => {
         console.log(result);
 
@@ -39,6 +42,7 @@ export class HomePage implements OnInit {
         return this.gmailSrv.getMail(mailId);
       })
       .then((result) => {
+        GmailUtils.getContentFromMessage(result);
         console.log(result);
       });
   }
