@@ -3,7 +3,7 @@ import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import credentials from 'src/res/credentials.json';
 import { Preferences } from '@capacitor/preferences';
-import { PreferenceStoreService } from 'src/app/services/PreferenceStore/preference-store.service';
+import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
 import { GmailUtils } from 'src/app/services/Gmail/gmail-utils';
 
 @Component({
