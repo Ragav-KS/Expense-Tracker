@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { GmailUtils } from '../../Gmail/gmail-utils';
 import { GmailService } from '../../Gmail/gmail.service';
 
 @Injectable({
@@ -8,6 +9,8 @@ export class MailProcessorService {
   mailList: gapi.client.gmail.Message[] = [];
 
   mails: gapi.client.gmail.Message[] = [];
+
+  contents: string[] = [];
 
   constructor(private gmailSrv: GmailService) {}
 
@@ -40,5 +43,17 @@ export class MailProcessorService {
     );
 
     return this.mails;
+  }
+
+  async loadContents() {
+    await Promise.all(
+      this.mails.map(async (mail) => {
+        await GmailUtils.getContentFromMessage(mail).then((result) => {
+          this.contents.push(result.body);
+        });
+      })
+    );
+
+    return this.contents;
   }
 }
