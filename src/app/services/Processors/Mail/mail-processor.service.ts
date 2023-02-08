@@ -7,6 +7,8 @@ import { GmailService } from '../../Gmail/gmail.service';
 export class MailProcessorService {
   mailList: gapi.client.gmail.Message[] = [];
 
+  mails: gapi.client.gmail.Message[] = [];
+
   constructor(private gmailSrv: GmailService) {}
 
   async loadMailList() {
@@ -16,7 +18,7 @@ export class MailProcessorService {
       await this.gmailSrv
         .getMailsList({
           pageToken: nextPageToken,
-          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-01',
+          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05',
         })
         .then((result) => {
           this.mailList.push(...result.messages!);
@@ -25,8 +27,18 @@ export class MailProcessorService {
         });
     }
 
-    console.log(this.mailList);
-
     return this.mailList;
+  }
+
+  async loadMessages() {
+    await Promise.all(
+      this.mailList.map(async (mail) => {
+        await this.gmailSrv.getMail(mail.id!).then((result) => {
+          this.mails.push(result);
+        });
+      })
+    );
+
+    return this.mails;
   }
 }
