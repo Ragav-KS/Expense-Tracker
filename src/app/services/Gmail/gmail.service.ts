@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
 
@@ -11,11 +11,15 @@ export class GmailService {
 
   private accessToken!: string;
 
+  private gapiLoadedEmitter!: EventEmitter<void>;
+
   constructor() {
     GoogleAuth.initialize({
       androidClientID: credentials.androidClientID,
       webClientID: credentials.webClientID,
     });
+
+    this.gapiLoadedEmitter = new EventEmitter();
 
     this.gapiLoadClient();
   }
@@ -27,6 +31,7 @@ export class GmailService {
           discoveryDocs: [this.discoveryDoc],
         })
         .then(() => {
+          this.gapiLoadedEmitter.emit();
           console.log('gapi client load success');
         })
         .catch((err) => {
@@ -46,17 +51,21 @@ export class GmailService {
       access_token: this.accessToken,
     });
 
-    let selectedUserID!: string;
-    await gapi.client.gmail.users
-      .getProfile({ userId: 'me' })
-      .then((res) => {
-        selectedUserID = res.result.emailAddress!;
-      })
-      .catch((err) => {
-        throw new Error('Failed to fetch user profile.');
-      });
+    return new Promise((resolve, reject) => {
+      this.gapiLoadedEmitter.subscribe((token) => {
+        let selectedUserID!: string;
 
-    return selectedUserID;
+        gapi.client.gmail.users
+          .getProfile({ userId: 'me' })
+          .then((res) => {
+            selectedUserID = res.result.emailAddress!;
+            resolve(selectedUserID);
+          })
+          .catch((err) => {
+            throw new Error('Failed to fetch user profile.');
+          });
+      });
+    });
   }
 
   public async getMailsList({
