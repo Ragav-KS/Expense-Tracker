@@ -45,6 +45,9 @@ export class HomePage implements OnInit {
             },
             (mail) => {
               return this.mailProcessorSrv.getBodyPipe(mail);
+            },
+            (body) => {
+              return this.contentProcessorSrv.extractText(body);
             }
           )
           .subscribe(console.log);

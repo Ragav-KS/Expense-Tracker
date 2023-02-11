@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { banksConfig } from 'src/res/banksConfig';
 
 @Injectable({
@@ -16,17 +17,18 @@ export class ContentProcessorService {
     )?.regexList!;
   }
 
-  async extractText(html: string[]): Promise<string[]> {
-    let extractedText: string[] = [];
+  extractText(data: Observable<{ id: string; html: string }>) {
+    return new Observable((observer) => {
+      data.subscribe((data) => {
+        let extractedText = this.parser.parseFromString(data.html, 'text/html')
+          .documentElement.innerText;
 
-    html.forEach((item) => {
-      let extract = this.parser.parseFromString(item, 'text/html')
-        .documentElement.innerText;
-
-      extractedText.push(extract);
+        observer.next({
+          id: data.id,
+          text: extractedText,
+        });
+      });
     });
-
-    return extractedText;
   }
 
   async extractData(text: string[]) {
