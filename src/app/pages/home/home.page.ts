@@ -48,6 +48,9 @@ export class HomePage implements OnInit {
             },
             (body) => {
               return this.contentProcessorSrv.extractText(body);
+            },
+            (text) => {
+              return this.contentProcessorSrv.extractData(text);
             }
           )
           .subscribe(console.log);
