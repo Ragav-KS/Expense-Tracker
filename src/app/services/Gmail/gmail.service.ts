@@ -87,6 +87,7 @@ export class GmailService {
         labelIds: labelIds,
         q: query,
         pageToken: pageToken,
+        maxResults: 500,
       })
       .then((res) => {
         response = res;
