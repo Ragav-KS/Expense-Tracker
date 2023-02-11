@@ -76,6 +76,8 @@ export class MailProcessorService {
     await Promise.all(
       mails.map(async (mail) => {
         await GmailUtils.getContentFromMessage(mail).then((result) => {
+          callBack(result.body);
+
           contents.push(result.body);
         });
       })
