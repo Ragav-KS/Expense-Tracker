@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, switchMap } from 'rxjs';
 import { GmailUtils } from '../../Gmail/gmail-utils';
 import { GmailService } from '../../Gmail/gmail.service';
 
@@ -7,28 +6,23 @@ import { GmailService } from '../../Gmail/gmail.service';
   providedIn: 'root',
 })
 export class MailProcessorService {
-  // mailList: gapi.client.gmail.Message[] = [];
-
-  // mails: gapi.client.gmail.Message[] = [];
-
-  // contents: string[] = [];
-
   constructor(private gmailSrv: GmailService) {}
 
   async getMailList(
+    query: string,
     progressCallback: CallableFunction = async (
       count: number,
       sizeEst: number
     ) => {}
   ): Promise<gapi.client.gmail.Message[]> {
-    let nextPageToken: string | undefined = '';
     let mailList: gapi.client.gmail.Message[] = [];
 
+    let nextPageToken: string | undefined = '';
     while (nextPageToken != undefined) {
       await this.gmailSrv
         .getMailsList({
           pageToken: nextPageToken,
-          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
+          query: query,
         })
         .then((result) => {
           progressCallback(result.messages?.length, result.resultSizeEstimate!);

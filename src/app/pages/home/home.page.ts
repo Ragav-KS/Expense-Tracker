@@ -39,6 +39,7 @@ export class HomePage implements OnInit {
     let count = 0;
 
     await this.MailProcessorSrv.getMailList(
+      'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
       (count: number, sizeEst: number) => {
         console.log(`${count} / ${sizeEst}`);
       }
