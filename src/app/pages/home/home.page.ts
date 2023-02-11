@@ -7,7 +7,7 @@ import { PreferenceStoreService } from 'src/app/services/Storage/preference-stor
 import { GmailUtils } from 'src/app/services/Gmail/gmail-utils';
 import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import { tap } from 'rxjs';
+import { from, map, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -36,34 +36,21 @@ export class HomePage implements OnInit {
   }
 
   async handlefetchMails() {
-    let count = 0;
-
-    await this.MailProcessorSrv.getMailList(
-      'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
-      (count: number, sizeEst: number) => {
-        console.log(`${count} / ${sizeEst}`);
-      }
-    )
-      .then((list) => {
-        console.log(list.length);
-
-        return this.MailProcessorSrv.loadMessages(list, () => {
-          count++;
-        });
-      })
-      .then((mails) => {
-        return this.MailProcessorSrv.loadContents(mails);
-      })
-      .then((contents) => {
-        console.log(contents[0]);
-      });
-
-    console.log(count);
-    // await this.MailProcessorSrv.loadContents().then((result) => {
-    //   let out = new DOMParser().parseFromString(result[0], 'text/html')
-    //     .documentElement.innerText;
-    //   console.log(out);
-    // });
+    this.MailProcessorSrv.getMailList(
+      'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05'
+    ).then((list) => {
+      from(list)
+        .pipe(
+          map((mail) => mail.id!),
+          (id) => {
+            return this.MailProcessorSrv.getMailPipe(id);
+          },
+          (mail) => {
+            return this.MailProcessorSrv.getBodyPipe(mail);
+          }
+        )
+        .subscribe(console.log);
+    });
   }
 
   async handleTestDatabase() {

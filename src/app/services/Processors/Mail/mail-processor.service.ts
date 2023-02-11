@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { GmailUtils } from '../../Gmail/gmail-utils';
 import { GmailService } from '../../Gmail/gmail.service';
 
@@ -36,47 +37,30 @@ export class MailProcessorService {
     return mailList;
   }
 
-  async loadMessages(
-    mailList: gapi.client.gmail.Message[] = [],
-    callBack: CallableFunction = async (mail?: gapi.client.gmail.Message) => {}
-  ): Promise<gapi.client.gmail.Message[]> {
-    let mails: gapi.client.gmail.Message[] = [];
-
-    await Promise.all(
-      mailList.map((mail) => {
-        return new Promise<void>((resolve, reject) => {
-          this.gmailSrv.getMail(mail.id!).then((result) => {
-            callBack(result);
-
-            mails.push(result);
-
-            resolve();
-          });
+  getMailPipe(
+    mailId: Observable<string>
+  ): Observable<gapi.client.gmail.Message> {
+    return new Observable((observer) => {
+      mailId.subscribe((mailId) => {
+        this.gmailSrv.getMail(mailId).then((result) => {
+          observer.next(result);
         });
-      })
-    );
-
-    return mails;
+      });
+    });
   }
 
-  async loadContents(
-    mails: gapi.client.gmail.Message[] = [],
-    callBack: CallableFunction = async (
-      content?: gapi.client.gmail.Message
-    ) => {}
-  ) {
-    let contents: string[] = [];
-
-    await Promise.all(
-      mails.map(async (mail) => {
-        await GmailUtils.getContentFromMessage(mail).then((result) => {
-          callBack(result.body);
-
-          contents.push(result.body);
+  getBodyPipe(
+    mail: Observable<gapi.client.gmail.Message>
+  ): Observable<{ id: string; body: string }> {
+    return new Observable((observer) => {
+      mail.subscribe((mail) => {
+        GmailUtils.getContentFromMessage(mail).then((result) => {
+          observer.next({
+            id: mail.id!,
+            body: result.body,
+          });
         });
-      })
-    );
-
-    return contents;
+      });
+    });
   }
 }
