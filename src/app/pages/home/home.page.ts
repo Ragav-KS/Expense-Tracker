@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
-import credentials from 'src/res/credentials.json';
-import { Preferences } from '@capacitor/preferences';
-import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
-import { GmailUtils } from 'src/app/services/Gmail/gmail-utils';
-import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
+import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import { tap } from 'rxjs';
+import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
+import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 
 @Component({
   selector: 'app-home',
@@ -19,7 +15,8 @@ export class HomePage implements OnInit {
     private gmailSrv: GmailService,
     private prefSrv: PreferenceStoreService,
     private sqliteSrv: SqliteStorageService,
-    private MailProcessorSrv: MailProcessorService
+    private mailProcessorSrv: MailProcessorService,
+    private contentProcessorSrv: ContentProcessorService
   ) {}
 
   ngOnInit(): void {
@@ -38,32 +35,31 @@ export class HomePage implements OnInit {
   async handlefetchMails() {
     let count = 0;
 
-    await this.MailProcessorSrv.getMailList(
-      'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
-      (count: number, sizeEst: number) => {
-        console.log(`${count} / ${sizeEst}`);
-      }
-    )
+    await this.mailProcessorSrv
+      .getMailList(
+        'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
+        (count: number, sizeEst: number) => {
+          console.log(`${count} / ${sizeEst}`);
+        }
+      )
       .then((list) => {
         console.log(list.length);
 
-        return this.MailProcessorSrv.loadMessages(list, () => {
+        return this.mailProcessorSrv.loadMessages(list, () => {
           count++;
         });
       })
       .then((mails) => {
-        return this.MailProcessorSrv.loadContents(mails);
+        return this.mailProcessorSrv.loadContents(mails);
       })
       .then((contents) => {
-        console.log(contents[0]);
+        return this.contentProcessorSrv.extractText(contents);
+      })
+      .then((extractedText) => {
+        console.log(extractedText);
       });
 
     console.log(count);
-    // await this.MailProcessorSrv.loadContents().then((result) => {
-    //   let out = new DOMParser().parseFromString(result[0], 'text/html')
-    //     .documentElement.innerText;
-    //   console.log(out);
-    // });
   }
 
   async handleTestDatabase() {
