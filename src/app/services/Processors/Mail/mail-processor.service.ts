@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { from, Observable, switchMap } from 'rxjs';
 import { GmailUtils } from '../../Gmail/gmail-utils';
 import { GmailService } from '../../Gmail/gmail.service';
 
@@ -26,7 +27,7 @@ export class MailProcessorService {
       await this.gmailSrv
         .getMailsList({
           pageToken: nextPageToken,
-          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2022-01-05',
+          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
         })
         .then((result) => {
           progressCallback(result.messages?.length, result.resultSizeEstimate!);
@@ -40,11 +41,22 @@ export class MailProcessorService {
     return this.mailList;
   }
 
-  async loadMessages() {
+  async loadMessages(
+    mailList: gapi.client.gmail.Message[] = [],
+    callBack: CallableFunction = async (mail?: gapi.client.gmail.Message) => {}
+  ): Promise<gapi.client.gmail.Message[]> {
+    let mails: gapi.client.gmail.Message[] = [];
+
     await Promise.all(
-      this.mailList.map(async (mail) => {
-        await this.gmailSrv.getMail(mail.id!).then((result) => {
-          this.mails.push(result);
+      mailList.map((mail) => {
+        return new Promise<void>((resolve, reject) => {
+          this.gmailSrv.getMail(mail.id!).then((result) => {
+            callBack(result);
+
+            mails.push(result);
+
+            resolve();
+          });
         });
       })
     );
