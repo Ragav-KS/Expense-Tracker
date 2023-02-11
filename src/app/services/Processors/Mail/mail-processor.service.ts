@@ -14,16 +14,23 @@ export class MailProcessorService {
 
   constructor(private gmailSrv: GmailService) {}
 
-  async loadMailList() {
+  async getMailList(
+    progressCallback: CallableFunction = async (
+      count: number,
+      sizeEst: number
+    ) => {}
+  ): Promise<gapi.client.gmail.Message[]> {
     let nextPageToken: string | undefined = '';
 
     while (nextPageToken != undefined) {
       await this.gmailSrv
         .getMailsList({
           pageToken: nextPageToken,
-          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05',
+          query: 'from: (alerts@hdfcbank.net) -"OTP is" after:2022-01-05',
         })
         .then((result) => {
+          progressCallback(result.messages?.length, result.resultSizeEstimate!);
+
           this.mailList.push(...result.messages!);
 
           nextPageToken = result.nextPageToken;
