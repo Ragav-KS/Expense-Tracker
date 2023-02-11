@@ -7,11 +7,11 @@ import { GmailService } from '../../Gmail/gmail.service';
   providedIn: 'root',
 })
 export class MailProcessorService {
-  mailList: gapi.client.gmail.Message[] = [];
+  // mailList: gapi.client.gmail.Message[] = [];
 
-  mails: gapi.client.gmail.Message[] = [];
+  // mails: gapi.client.gmail.Message[] = [];
 
-  contents: string[] = [];
+  // contents: string[] = [];
 
   constructor(private gmailSrv: GmailService) {}
 
@@ -22,6 +22,7 @@ export class MailProcessorService {
     ) => {}
   ): Promise<gapi.client.gmail.Message[]> {
     let nextPageToken: string | undefined = '';
+    let mailList: gapi.client.gmail.Message[] = [];
 
     while (nextPageToken != undefined) {
       await this.gmailSrv
@@ -32,13 +33,13 @@ export class MailProcessorService {
         .then((result) => {
           progressCallback(result.messages?.length, result.resultSizeEstimate!);
 
-          this.mailList.push(...result.messages!);
+          mailList.push(...result.messages!);
 
           nextPageToken = result.nextPageToken;
         });
     }
 
-    return this.mailList;
+    return mailList;
   }
 
   async loadMessages(
@@ -61,18 +62,25 @@ export class MailProcessorService {
       })
     );
 
-    return this.mails;
+    return mails;
   }
 
-  async loadContents() {
+  async loadContents(
+    mails: gapi.client.gmail.Message[] = [],
+    callBack: CallableFunction = async (
+      content?: gapi.client.gmail.Message
+    ) => {}
+  ) {
+    let contents: string[] = [];
+
     await Promise.all(
-      this.mails.map(async (mail) => {
+      mails.map(async (mail) => {
         await GmailUtils.getContentFromMessage(mail).then((result) => {
-          this.contents.push(result.body);
+          contents.push(result.body);
         });
       })
     );
 
-    return this.contents;
+    return contents;
   }
 }

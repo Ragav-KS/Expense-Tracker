@@ -36,18 +36,26 @@ export class HomePage implements OnInit {
   }
 
   async handlefetchMails() {
-    let list = await this.MailProcessorSrv.getMailList(
-      async (count: number, sizeEst: number) => {
+    let count = 0;
+
+    await this.MailProcessorSrv.getMailList(
+      (count: number, sizeEst: number) => {
         console.log(`${count} / ${sizeEst}`);
       }
-    );
+    )
+      .then((list) => {
+        console.log(list.length);
 
-    console.log(list.length);
-
-    let count = 0;
-    await this.MailProcessorSrv.loadMessages(list, () => {
-      count++;
-    });
+        return this.MailProcessorSrv.loadMessages(list, () => {
+          count++;
+        });
+      })
+      .then((mails) => {
+        return this.MailProcessorSrv.loadContents(mails);
+      })
+      .then((contents) => {
+        console.log(contents[0]);
+      });
 
     console.log(count);
     // await this.MailProcessorSrv.loadContents().then((result) => {
