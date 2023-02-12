@@ -2,7 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import { from, map, Observable, tap } from 'rxjs';
+import {
+  concatMap,
+  from,
+  map,
+  mergeMap,
+  Observable,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
 import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 
@@ -39,19 +47,27 @@ export class HomePage implements OnInit {
       .then((list) => {
         from(list)
           .pipe(
-            map((mail) => mail.id!),
-            (id) => {
-              return this.mailProcessorSrv.getMailPipe(id);
-            },
-            (mail) => {
-              return this.mailProcessorSrv.getPayloadPipe(mail);
-            },
-            (body) => {
-              return this.contentProcessorSrv.extractTextPipe(body);
-            },
-            (text) => {
-              return this.contentProcessorSrv.extractDataPipe(text);
-            }
+            // map((mail) => mail.id!),
+            concatMap(async (mail) => {
+              let mailId = mail.id!;
+
+              let result = await this.mailProcessorSrv
+                .getMail(mailId)
+                .then((mail) => {
+                  return this.mailProcessorSrv.getPayload(mail);
+                })
+                .then((payload) => {
+                  return this.contentProcessorSrv.extractText(payload.body);
+                })
+                .then((text) => {
+                  return this.contentProcessorSrv.extractData(text);
+                });
+
+              return {
+                id: mailId,
+                ...result,
+              };
+            })
           )
           .subscribe(console.log);
       });

@@ -37,30 +37,11 @@ export class MailProcessorService {
     return mailList;
   }
 
-  getMailPipe(
-    mailId: Observable<string>
-  ): Observable<gapi.client.gmail.Message> {
-    return new Observable((observer) => {
-      mailId.subscribe((mailId) => {
-        this.gmailSrv.getMail(mailId).then((result) => {
-          observer.next(result);
-        });
-      });
-    });
+  async getMail(mailId: string) {
+    return await this.gmailSrv.getMail(mailId);
   }
 
-  getPayloadPipe(
-    mail: Observable<gapi.client.gmail.Message>
-  ): Observable<{ id: string; html: string }> {
-    return new Observable((observer) => {
-      mail.subscribe((mail) => {
-        GmailUtils.getPayloadFromMail(mail).then((result) => {
-          observer.next({
-            id: mail.id!,
-            html: result.body,
-          });
-        });
-      });
-    });
+  async getPayload(mail: gapi.client.gmail.Message) {
+    return await GmailUtils.getPayloadFromMail(mail);
   }
 }
