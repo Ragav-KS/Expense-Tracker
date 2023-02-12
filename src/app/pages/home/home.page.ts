@@ -1,18 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { concatMap, from, map } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import {
-  concat,
-  concatAll,
-  concatMap,
-  from,
-  map,
-  mergeMap,
-  Observable,
-  switchMap,
-  tap,
-} from 'rxjs';
 import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
 import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 
@@ -47,14 +37,16 @@ export class HomePage implements OnInit {
     this.mailProcessorSrv
       .getMailList('from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05')
       .then((list) => {
+        console.log(list);
+
         from(list)
           .pipe(
             map((mail) => mail.id!),
             concatMap(async (mailId) => {
               return this.mailProcessorSrv.getMail(mailId);
             }),
-            mergeMap(async (mail) => {
-              let result = await this.mailProcessorSrv.getPayload(mail);
+            map((mail) => {
+              let result = this.mailProcessorSrv.getPayload(mail);
 
               return {
                 id: mail.id!,
@@ -62,10 +54,8 @@ export class HomePage implements OnInit {
                 date: result.date,
               };
             }),
-            mergeMap(async (payload) => {
-              let result = await this.contentProcessorSrv.extractText(
-                payload.body
-              );
+            map((payload) => {
+              let result = this.contentProcessorSrv.extractText(payload.body);
 
               return {
                 id: payload.id,
@@ -73,7 +63,7 @@ export class HomePage implements OnInit {
                 date: payload.date,
               };
             }),
-            mergeMap(async (payloadText) => {
+            map((payloadText) => {
               let result = this.contentProcessorSrv.extractData(
                 payloadText.text
               );

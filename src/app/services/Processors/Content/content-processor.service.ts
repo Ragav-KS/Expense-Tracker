@@ -17,12 +17,14 @@ export class ContentProcessorService {
     )?.regexList!;
   }
 
-  async extractText(html: string) {
+  extractText(html: string): string {
     return this.parser.parseFromString(html, 'text/html').documentElement
       .innerText;
   }
 
-  async extractData(payloadText: string) {
+  extractData(payloadText: string): {
+    [key: string]: string | null;
+  } {
     let data: {
       [key: string]: string | null;
     } = {

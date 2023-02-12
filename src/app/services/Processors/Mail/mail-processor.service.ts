@@ -41,7 +41,7 @@ export class MailProcessorService {
     return await this.gmailSrv.getMail(mailId);
   }
 
-  async getPayload(mail: gapi.client.gmail.Message) {
-    return await GmailUtils.getPayloadFromMail(mail);
+  getPayload(mail: gapi.client.gmail.Message) {
+    return GmailUtils.getPayloadFromMail(mail);
   }
 }
