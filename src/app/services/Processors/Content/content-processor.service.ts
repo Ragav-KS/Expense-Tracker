@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { banksConfig } from 'src/res/banksConfig';
 
 @Injectable({
@@ -16,55 +17,41 @@ export class ContentProcessorService {
     )?.regexList!;
   }
 
-  async extractText(html: string[]): Promise<string[]> {
-    let extractedText: string[] = [];
-
-    html.forEach((item) => {
-      let extract = this.parser.parseFromString(item, 'text/html')
-        .documentElement.innerText;
-
-      extractedText.push(extract);
-    });
-
-    return extractedText;
+  extractText(html: string): string {
+    return this.parser.parseFromString(html, 'text/html').documentElement
+      .innerText;
   }
 
-  async extractData(text: string[]) {
-    let matchList: {
+  extractData(payloadText: string): {
+    [key: string]: string | null;
+  } {
+    let data: {
       [key: string]: string | null;
-    }[] = [];
+    } = {
+      amount: null,
+      type: null,
+      account: null,
+      mode: null,
+      party: null,
+      date: null,
+      time: null,
+    };
 
-    text.forEach((item) => {
-      let data: {
-        [key: string]: string | null;
-      } = {
-        amount: null,
-        type: null,
-        account: null,
-        mode: null,
-        party: null,
-        date: null,
-        time: null,
-      };
+    for (let regexObj of this.regexObjects) {
+      let match = regexObj.regex.exec(payloadText);
 
-      for (let regexObj of this.regexObjects) {
-        let match = regexObj.regex.exec(item);
-
-        if (match) {
-          data['amount'] = match.groups!['amount'];
-          data['type'] = regexObj['type'];
-          data['account'] = match?.groups!['account'];
-          data['mode'] = regexObj['mode'];
-          data['party'] = match.groups!['party'];
-          data['date'] = match.groups!['date'];
-          data['time'] = match.groups!['time'];
-          break;
-        }
+      if (match) {
+        data['amount'] = match.groups!['amount'];
+        data['type'] = regexObj['type'];
+        data['account'] = match?.groups!['account'];
+        data['mode'] = regexObj['mode'];
+        data['party'] = match.groups!['party'];
+        data['date'] = match.groups!['date'];
+        data['time'] = match.groups!['time'];
+        break;
       }
+    }
 
-      matchList.push(data);
-    });
-
-    return matchList;
+    return data;
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { concatMap, from, map } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
@@ -33,36 +34,49 @@ export class HomePage implements OnInit {
   }
 
   async handlefetchMails() {
-    let count = 0;
-
-    await this.mailProcessorSrv
-      .getMailList(
-        'from: (alerts@hdfcbank.net) -"OTP is" after:2023-01-05',
-        (count: number, sizeEst: number) => {
-          console.log(`${count} / ${sizeEst}`);
-        }
-      )
+    this.mailProcessorSrv
+      .getMailList('from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05')
       .then((list) => {
-        console.log(list.length);
+        console.log(list);
 
-        return this.mailProcessorSrv.loadMessages(list, () => {
-          count++;
-        });
-      })
-      .then((mails) => {
-        return this.mailProcessorSrv.loadContents(mails);
-      })
-      .then((contents) => {
-        return this.contentProcessorSrv.extractText(contents);
-      })
-      .then((extractedText) => {
-        return this.contentProcessorSrv.extractData(extractedText);
-      })
-      .then((data) => {
-        console.log(data);
+        from(list)
+          .pipe(
+            map((mail) => mail.id!),
+            concatMap(async (mailId) => {
+              return this.mailProcessorSrv.getMail(mailId);
+            }),
+            map((mail) => {
+              let result = this.mailProcessorSrv.getPayload(mail);
+
+              return {
+                id: mail.id!,
+                body: result.body,
+                date: result.date,
+              };
+            }),
+            map((payload) => {
+              let result = this.contentProcessorSrv.extractText(payload.body);
+
+              return {
+                id: payload.id,
+                text: result,
+                date: payload.date,
+              };
+            }),
+            map((payloadText) => {
+              let result = this.contentProcessorSrv.extractData(
+                payloadText.text
+              );
+
+              return {
+                id: payloadText.id,
+                ...result,
+                date: payloadText.date,
+              };
+            })
+          )
+          .subscribe(console.log);
       });
-
-    console.log(count);
   }
 
   async handleTestDatabase() {

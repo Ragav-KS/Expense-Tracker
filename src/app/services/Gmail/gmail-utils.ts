@@ -1,7 +1,9 @@
 export class GmailUtils {
-  public static async getContentFromMessage(
-    message: gapi.client.gmail.Message
-  ): Promise<{ date: string; subject: string; body: string }> {
+  public static getPayloadFromMail(message: gapi.client.gmail.Message): {
+    date: string;
+    subject: string;
+    body: string;
+  } {
     let headers = new Map();
     message.payload?.headers!.forEach((header) => {
       headers.set(header.name, header.value);
