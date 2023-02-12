@@ -3,6 +3,8 @@ import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
 import {
+  concat,
+  concatAll,
   concatMap,
   from,
   map,
@@ -47,25 +49,39 @@ export class HomePage implements OnInit {
       .then((list) => {
         from(list)
           .pipe(
-            // map((mail) => mail.id!),
-            concatMap(async (mail) => {
-              let mailId = mail.id!;
-
-              let result = await this.mailProcessorSrv
-                .getMail(mailId)
-                .then((mail) => {
-                  return this.mailProcessorSrv.getPayload(mail);
-                })
-                .then((payload) => {
-                  return this.contentProcessorSrv.extractText(payload.body);
-                })
-                .then((text) => {
-                  return this.contentProcessorSrv.extractData(text);
-                });
+            map((mail) => mail.id!),
+            concatMap(async (mailId) => {
+              return this.mailProcessorSrv.getMail(mailId);
+            }),
+            mergeMap(async (mail) => {
+              let result = await this.mailProcessorSrv.getPayload(mail);
 
               return {
-                id: mailId,
+                id: mail.id!,
+                body: result.body,
+                date: result.date,
+              };
+            }),
+            mergeMap(async (payload) => {
+              let result = await this.contentProcessorSrv.extractText(
+                payload.body
+              );
+
+              return {
+                id: payload.id,
+                text: result,
+                date: payload.date,
+              };
+            }),
+            mergeMap(async (payloadText) => {
+              let result = this.contentProcessorSrv.extractData(
+                payloadText.text
+              );
+
+              return {
+                id: payloadText.id,
                 ...result,
+                date: payloadText.date,
               };
             })
           )
