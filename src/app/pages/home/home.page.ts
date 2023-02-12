@@ -44,13 +44,13 @@ export class HomePage implements OnInit {
               return this.mailProcessorSrv.getMailPipe(id);
             },
             (mail) => {
-              return this.mailProcessorSrv.getBodyPipe(mail);
+              return this.mailProcessorSrv.getPayloadPipe(mail);
             },
             (body) => {
-              return this.contentProcessorSrv.extractText(body);
+              return this.contentProcessorSrv.extractTextPipe(body);
             },
             (text) => {
-              return this.contentProcessorSrv.extractData(text);
+              return this.contentProcessorSrv.extractDataPipe(text);
             }
           )
           .subscribe(console.log);

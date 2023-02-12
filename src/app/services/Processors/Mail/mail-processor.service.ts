@@ -49,12 +49,12 @@ export class MailProcessorService {
     });
   }
 
-  getBodyPipe(
+  getPayloadPipe(
     mail: Observable<gapi.client.gmail.Message>
   ): Observable<{ id: string; html: string }> {
     return new Observable((observer) => {
       mail.subscribe((mail) => {
-        GmailUtils.getContentFromMessage(mail).then((result) => {
+        GmailUtils.getPayloadFromMail(mail).then((result) => {
           observer.next({
             id: mail.id!,
             html: result.body,

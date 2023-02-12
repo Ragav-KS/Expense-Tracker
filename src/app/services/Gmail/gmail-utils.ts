@@ -1,5 +1,5 @@
 export class GmailUtils {
-  public static async getContentFromMessage(
+  public static async getPayloadFromMail(
     message: gapi.client.gmail.Message
   ): Promise<{ date: string; subject: string; body: string }> {
     let headers = new Map();
