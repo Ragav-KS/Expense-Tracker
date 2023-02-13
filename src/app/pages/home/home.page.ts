@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { concatMap, from, map } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
@@ -21,7 +22,9 @@ export class HomePage implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.handleLogin();
+    if (Capacitor.getPlatform() !== 'web') {
+      this.handleLogin();
+    }
     this.sqliteSrv.initializeDB();
   }
 
