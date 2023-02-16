@@ -4,8 +4,8 @@ import { concatMap, from, map } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
-import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
+import { PreferenceStoreService } from 'src/app/services/Storage/Preferences/preference-store.service';
+import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
 
 @Component({
   selector: 'app-home',

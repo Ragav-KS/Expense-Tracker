@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { SqliteStorageService } from './services/Storage/sqlite-storage.service';
+import { SqliteStorageService } from './services/Storage/SQLite/sqlite-storage.service';
 
 @Component({
   selector: 'app-root',

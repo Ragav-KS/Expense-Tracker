@@ -7,7 +7,7 @@ import {
 } from '@capacitor-community/sqlite';
 import { Capacitor, CapacitorException } from '@capacitor/core';
 import { firstValueFrom } from 'rxjs';
-import { PreferenceStoreService } from './preference-store.service';
+import { PreferenceStoreService } from '../Preferences/preference-store.service';
 
 const DB_SETUP_KEY = 'first_db_setup';
 const DB_NAME = 'myDB';
