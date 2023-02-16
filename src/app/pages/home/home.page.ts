@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
 import { concatMap, from, map } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
-import { PreferenceStoreService } from 'src/app/services/Storage/Preferences/preference-store.service';
 import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
 
 @Component({
@@ -15,25 +13,15 @@ import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-sto
 export class HomePage implements OnInit {
   constructor(
     private gmailSrv: GmailService,
-    private prefSrv: PreferenceStoreService,
     private sqliteSrv: SqliteStorageService,
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService
   ) {}
 
-  ngOnInit(): void {
-    if (Capacitor.getPlatform() !== 'web') {
-      this.handleLogin();
-    }
-  }
+  ngOnInit(): void {}
 
   async handleLogin() {
-    let userID: string = await this.prefSrv.get('userID');
-
-    this.gmailSrv.loadToken(userID).then((result) => {
-      console.info(`>>>> [GAuth] logged in as ${result}`);
-      this.prefSrv.set('userID', result);
-    });
+    await this.gmailSrv.login();
   }
 
   async handlefetchMails() {

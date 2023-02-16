@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
+import { PreferenceStoreService } from '../Storage/Preferences/preference-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class GmailService {
 
   public loggedIn = false;
 
-  constructor() {
+  constructor(private prefSrv: PreferenceStoreService) {
     GoogleAuth.initialize({
       androidClientID: credentials.androidClientID,
       webClientID: credentials.webClientID,
@@ -73,6 +74,15 @@ export class GmailService {
       });
 
     return selectedUserID;
+  }
+
+  async login() {
+    let userID: string = await this.prefSrv.get('userID');
+
+    let result = await this.loadToken(userID);
+
+    console.info(`>>>> [GAuth] logged in as ${result}`);
+    await this.prefSrv.set('userID', result);
   }
 
   public async getMailsList({
