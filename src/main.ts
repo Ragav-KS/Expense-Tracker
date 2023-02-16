@@ -12,4 +12,4 @@ if (environment.production) {
 jeepSqlite(window);
 platformBrowserDynamic()
   .bootstrapModule(AppModule)
-  .catch((err) => console.log(err));
+  .catch((err) => console.error(err));

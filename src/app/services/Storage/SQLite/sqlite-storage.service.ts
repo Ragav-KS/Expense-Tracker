@@ -16,73 +16,62 @@ const DB_NAME = 'myDB';
   providedIn: 'root',
 })
 export class SqliteStorageService {
-  platform!: string;
-  native!: boolean;
-
-  sqlitePlugin!: CapacitorSQLitePlugin;
+  private platform!: string;
+  private native!: boolean;
 
   connection!: SQLiteConnection;
   myDB!: SQLiteDBConnection;
 
-  isService!: boolean;
-
   connectionReady: boolean = false;
-  private connectionReadyEmitter!: EventEmitter<void>;
+  private connectionReadyEmitter = new EventEmitter<void>();
 
-  constructor(private prefSrv: PreferenceStoreService) {
-    this.connectionReady = false;
-    this.connectionReadyEmitter = new EventEmitter();
-  }
+  constructor(private prefSrv: PreferenceStoreService) {}
 
   async initializePlugin(): Promise<boolean> {
     this.platform = Capacitor.getPlatform();
 
-    this.sqlitePlugin = CapacitorSQLite;
+    console.info('>>>> [sqlite] Initializing Sqlite Connection');
+
     this.connection = new SQLiteConnection(CapacitorSQLite);
 
     if (this.platform === 'ios' || this.platform === 'android') {
       this.native = true;
 
       this.connectionReady = true;
+      console.info('>>>> [sqlite] Sqlite Connection Ready');
       this.connectionReadyEmitter.emit();
     }
-
-    this.isService = true;
 
     return true;
   }
 
   async initWebStore(): Promise<void> {
-    if (this.platform !== 'web') {
-      return Promise.reject(
-        new Error(`not implemented for this platform: ${this.platform}`)
-      );
-    }
+    console.info('>>>> [sqlite] Initializing Web Store');
 
     if (this.connection != null) {
       try {
         await this.connection.initWebStore();
 
         this.connectionReady = true;
+        console.info('>>>> [sqlite] Sqlite Connection Ready');
         this.connectionReadyEmitter.emit();
 
-        return Promise.resolve();
+        return;
       } catch (err) {
-        return Promise.reject(new Error('Problem'));
+        throw err;
       }
     } else {
-      return Promise.reject(new Error(`no connection open`));
+      throw Error(`no connection open`);
     }
   }
 
   async initializeDB() {
-    this.setupDatabase();
-  }
-
-  private async setupDatabase() {
     if (!this.connectionReady) {
+      console.info('>>>> [sqlite] Waiting for Sqlite Connection');
       await firstValueFrom(this.connectionReadyEmitter);
     }
+
+    console.info('>>>> [sqlite] Initializing DB');
 
     try {
       await CapacitorSQLite.createConnection({
@@ -99,9 +88,13 @@ export class SqliteStorageService {
 
     await CapacitorSQLite.open({ database: DB_NAME });
 
+    console.info('>>>> [sqlite] DB Connected');
+
     const dbSetupDone = await this.prefSrv.get(DB_SETUP_KEY);
 
     if (!dbSetupDone) {
+      console.info('>>>> [sqlite] Setting up DB');
+
       await this.execute(`
         CREATE TABLE [mails] ( 
           [id] VARCHAR(250) NOT NULL,

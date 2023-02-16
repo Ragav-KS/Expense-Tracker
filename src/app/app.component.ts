@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
 import { SqliteStorageService } from './services/Storage/SQLite/sqlite-storage.service';
 
@@ -10,6 +11,7 @@ import { SqliteStorageService } from './services/Storage/SQLite/sqlite-storage.s
 export class AppComponent {
   initPlugin!: boolean;
   isWeb!: boolean;
+
   constructor(
     private platform: Platform,
     private sqliteSrv: SqliteStorageService
@@ -18,24 +20,31 @@ export class AppComponent {
   }
 
   initializeApp() {
+    console.info('>>>> Initializing App');
+
     this.platform.ready().then(async () => {
+      let platform = Capacitor.getPlatform();
+
+      console.info(`>>>> Platform is ready - ${platform}`);
+
       this.sqliteSrv.initializePlugin().then(async (ret) => {
-        this.initPlugin = ret;
-        if (this.sqliteSrv.platform === 'web') {
+        if (platform === 'web') {
           this.isWeb = true;
+
+          console.info('>>>> [sqlite] Load jeep-sqlite');
 
           await customElements.whenDefined('jeep-sqlite');
           const jeepSqliteEl = document.querySelector('jeep-sqlite');
 
           if (jeepSqliteEl != null) {
             await this.sqliteSrv.initWebStore();
-            console.log(`>>>> isStoreOpen ${await jeepSqliteEl.isStoreOpen()}`);
+            console.info(
+              `>>>> [sqlite] webStore Open? -> ${await jeepSqliteEl.isStoreOpen()}`
+            );
           } else {
-            console.log('>>>> jeepSqliteEl is null');
+            throw Error('jeepSqliteEl is null');
           }
         }
-
-        console.log(`>>>> in App  this.initPlugin ${this.initPlugin}`);
       });
     });
   }
