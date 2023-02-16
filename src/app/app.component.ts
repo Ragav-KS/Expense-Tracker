@@ -45,6 +45,8 @@ export class AppComponent {
             throw Error('jeepSqliteEl is null');
           }
         }
+
+        this.sqliteSrv.initializeDB();
       });
     });
   }

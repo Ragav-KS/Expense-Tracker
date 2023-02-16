@@ -25,7 +25,6 @@ export class HomePage implements OnInit {
     if (Capacitor.getPlatform() !== 'web') {
       this.handleLogin();
     }
-    this.sqliteSrv.initializeDB();
   }
 
   async handleLogin() {
