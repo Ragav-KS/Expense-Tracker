@@ -19,11 +19,14 @@ export class SqliteStorageService {
   private platform!: string;
   private native!: boolean;
 
-  connection!: SQLiteConnection;
-  myDB!: SQLiteDBConnection;
+  private connection!: SQLiteConnection;
+  private myDB!: SQLiteDBConnection;
 
-  connectionReady: boolean = false;
+  private connectionReady: boolean = false;
   private connectionReadyEmitter = new EventEmitter<void>();
+
+  public DBReady: boolean = false;
+  public DBReadyEmitter = new EventEmitter<void>();
 
   constructor(private prefSrv: PreferenceStoreService) {}
 
@@ -105,6 +108,10 @@ export class SqliteStorageService {
 
       this.prefSrv.set(DB_SETUP_KEY, '1');
     }
+
+    this.DBReady = true;
+    console.info('>>>> [sqlite] DB Ready');
+    this.DBReadyEmitter.emit();
   }
 
   async query(query: string) {

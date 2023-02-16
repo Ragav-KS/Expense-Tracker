@@ -17,6 +17,7 @@ export class GmailService {
   private gapiLoadedEmitter = new EventEmitter<void>();
 
   public loggedIn = false;
+  public loginEmitter = new EventEmitter<void>();
 
   constructor(private prefSrv: PreferenceStoreService) {
     GoogleAuth.initialize({
@@ -47,7 +48,6 @@ export class GmailService {
     await GoogleAuth.getToken({
       selectedAccount: account,
     }).then((result) => {
-      this.loggedIn = true;
       this.accessToken = result.token;
     });
 
@@ -56,6 +56,9 @@ export class GmailService {
     gapi.client.setToken({
       access_token: this.accessToken,
     });
+
+    this.loggedIn = true;
+    this.loginEmitter.emit();
 
     if (!this.gapiLoaded) {
       console.info('>>>> [sqlite] Waiting for Gapi Client');
