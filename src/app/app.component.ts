@@ -40,7 +40,7 @@ export class AppComponent {
         await this.sqliteSrv.initializeDB();
       });
 
-      if (this.isWeb !== true) {
+      if (platform !== 'web') {
         await this.gmailSrv.login();
       }
     });
