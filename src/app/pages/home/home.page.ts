@@ -31,6 +31,7 @@ export class HomePage implements OnInit {
     let userID: string = await this.prefSrv.get('userID');
 
     this.gmailSrv.loadToken(userID).then((result) => {
+      console.info(`>>>> [GAuth] logged in as ${result}`);
       this.prefSrv.set('userID', result);
     });
   }
