@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { concatMap, filter, firstValueFrom, from, map, tap } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
+import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
 import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
@@ -17,7 +18,8 @@ export class HomePage implements OnInit {
     private gmailSrv: GmailService,
     private sqliteSrv: SqliteStorageService,
     private mailProcessorSrv: MailProcessorService,
-    private contentProcessorSrv: ContentProcessorService
+    private contentProcessorSrv: ContentProcessorService,
+    private jobsSrv: JobsService
   ) {}
 
   private transactionsRepo!: Repository<Transaction>;
@@ -42,76 +44,22 @@ export class HomePage implements OnInit {
   }
 
   async handlefetchMails() {
-    this.mailProcessorSrv
-      .getMailList('from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05')
-      .then((list) => {
-        console.log(list);
+    this.jobsSrv.loadData().subscribe({
+      next: (val) => {
+        const transaction = new Transaction();
 
-        from(list)
-          .pipe(
-            map((mail) => mail.id!),
-            concatMap((mailId) =>
-              from(
-                this.transactionsRepo.findOneBy({
-                  id: mailId,
-                })
-              ).pipe(
-                filter((trns) => {
-                  return trns == null;
-                }),
-                map(() => mailId)
-              )
-            ),
-            tap((mailId) => console.log(mailId)),
-            concatMap(async (mailId) => {
-              return this.mailProcessorSrv.getMail(mailId);
-            }),
-            map((mail) => {
-              let result = this.mailProcessorSrv.getPayload(mail);
+        transaction.id = val['id']!;
+        transaction.amount = Number(val['amount']);
 
-              return {
-                id: mail.id!,
-                body: result.body,
-                date: result.date,
-              };
-            }),
-            map((payload) => {
-              let result = this.contentProcessorSrv.extractText(payload.body);
+        this.transactionsRepo.save(transaction);
 
-              return {
-                id: payload.id,
-                text: result,
-                date: payload.date,
-              };
-            }),
-            map((payloadText) => {
-              let result = this.contentProcessorSrv.extractData(
-                payloadText.text
-              );
-
-              return {
-                id: payloadText.id,
-                ...result,
-                date: payloadText.date,
-              };
-            }),
-            tap((payloadData: { [key: string]: string | null }) => {
-              const transaction = new Transaction();
-
-              transaction.id = payloadData['id']!;
-              transaction.amount = Number(payloadData['amount']);
-
-              this.transactionsRepo.save(transaction);
-            })
-          )
-          .subscribe({
-            next: (val) => console.log(val),
-            complete: () => {
-              console.log('done');
-              this.sqliteSrv.saveDB();
-            },
-          });
-      });
+        console.log(val);
+      },
+      complete: () => {
+        console.log('done');
+        this.sqliteSrv.saveDB();
+      },
+    });
   }
 
   async handleDBRead() {
