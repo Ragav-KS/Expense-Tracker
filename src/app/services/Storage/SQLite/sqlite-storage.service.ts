@@ -7,6 +7,8 @@ import {
 } from '@capacitor-community/sqlite';
 import { Capacitor, CapacitorException } from '@capacitor/core';
 import { firstValueFrom } from 'rxjs';
+import { Transaction } from 'src/app/entities/transaction';
+import { DataSource } from 'typeorm';
 import { PreferenceStoreService } from '../Preferences/preference-store.service';
 
 const DB_SETUP_KEY = 'first_db_setup';
@@ -21,6 +23,7 @@ export class SqliteStorageService {
 
   private connection!: SQLiteConnection;
   private myDB!: SQLiteDBConnection;
+  public AppDataSource!: DataSource;
 
   private connectionReady: boolean = false;
   private connectionReadyEmitter = new EventEmitter<void>();
@@ -76,38 +79,21 @@ export class SqliteStorageService {
 
     console.info('>>>> [sqlite] Initializing DB');
 
-    try {
-      await CapacitorSQLite.createConnection({
-        database: DB_NAME,
+    this.AppDataSource = new DataSource({
+      type: 'capacitor',
+      driver: this.connection,
+      database: DB_NAME,
+      entities: [Transaction],
+      synchronize: true,
+    });
+
+    await this.AppDataSource.initialize()
+      .then(() => {
+        console.log('>>>> [typeorm] Data Source has been initialized!');
+      })
+      .catch((err) => {
+        throw Error('Error during Data Source initialization');
       });
-    } catch (error: unknown) {
-      if (!(error instanceof CapacitorException)) {
-        throw error;
-      }
-      if (!error.message.includes('already exists')) {
-        throw error;
-      }
-    }
-
-    await CapacitorSQLite.open({ database: DB_NAME });
-
-    console.info('>>>> [sqlite] DB Connected');
-
-    const dbSetupDone = await this.prefSrv.get(DB_SETUP_KEY);
-
-    if (!dbSetupDone) {
-      console.info('>>>> [sqlite] Setting up DB');
-
-      await this.execute(`
-        CREATE TABLE [mails] ( 
-          [id] VARCHAR(250) NOT NULL,
-          [threadId] VARCHAR(250) NOT NULL,
-          PRIMARY KEY ([id])
-        );
-      `);
-
-      this.prefSrv.set(DB_SETUP_KEY, '1');
-    }
 
     this.DBReady = true;
     console.info('>>>> [sqlite] DB Ready');
