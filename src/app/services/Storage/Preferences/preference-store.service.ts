@@ -26,7 +26,7 @@ export class PreferenceStoreService {
           resolve();
         })
         .catch((err) => {
-          throw new Error(`Failed to store value with key: ${key}.`);
+          throw new Error(`Failed to store value with key: ${key}.` + err);
         });
     });
   }

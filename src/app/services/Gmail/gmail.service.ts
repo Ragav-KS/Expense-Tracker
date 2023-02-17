@@ -39,7 +39,7 @@ export class GmailService {
           this.gapiLoadedEmitter.emit();
         })
         .catch((err) => {
-          new Error('gapi client load failed.');
+          new Error('gapi client load failed.' + err);
         });
     });
   }
@@ -73,7 +73,7 @@ export class GmailService {
         selectedUserID = res.result.emailAddress!;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch user profile.');
+        throw new Error('Failed to fetch user profile.' + err);
       });
 
     return selectedUserID;
@@ -113,7 +113,7 @@ export class GmailService {
         response = res;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch message list.');
+        throw new Error('Failed to fetch message list.' + err);
       });
 
     return response.result;
@@ -135,7 +135,7 @@ export class GmailService {
         response = res;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch message.');
+        throw new Error('Failed to fetch message.' + err);
       });
 
     return response.result;
