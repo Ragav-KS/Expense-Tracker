@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NavController } from '@ionic/angular';
 import { concatMap, filter, firstValueFrom, from, map, tap } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
@@ -19,7 +20,8 @@ export class HomePage implements OnInit {
     private sqliteSrv: SqliteStorageService,
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService,
-    private jobsSrv: JobsService
+    private jobsSrv: JobsService,
+    private navCtrl: NavController
   ) {}
 
   private transactionsRepo!: Repository<Transaction>;
@@ -65,5 +67,9 @@ export class HomePage implements OnInit {
   async handleDBRead() {
     const savedPhotos = await this.transactionsRepo.find();
     console.log(savedPhotos);
+  }
+
+  handleGoToTransactions() {
+    this.navCtrl.navigateForward('/transactions');
   }
 }

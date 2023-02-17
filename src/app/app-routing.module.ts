@@ -11,7 +11,11 @@ const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
+  },  {
+    path: 'transactions',
+    loadChildren: () => import('./pages/transactions/transactions.module').then( m => m.TransactionsPageModule)
   },
+
 ];
 
 @NgModule({
