@@ -51,7 +51,12 @@ export class HomePage implements OnInit {
         const transaction = new Transaction();
 
         transaction.id = val['id']!;
+
         transaction.amount = Number(val['amount']);
+        transaction.transactionType = val['type']!;
+        transaction.account = val['account']!;
+        transaction.mode = val['mode']!;
+        transaction.party = val['party']!;
 
         this.transactionsRepo.save(transaction);
 

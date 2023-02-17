@@ -12,8 +12,10 @@
     <ion-item *ngFor="let transaction of transactionsList">
       <ion-card>
         <ion-label>
-          <h2>{{transaction.amount}}</h2>
-          <p>{{transaction.date}}</p>
+          <h2>{{ transaction.party }}</h2>
+          <p>{{ transaction.amount }}</p>
+          <p>{{ transaction.mode }}</p>
+          <p>{{ transaction.transactionType }}</p>
         </ion-label>
       </ion-card>
     </ion-item>
