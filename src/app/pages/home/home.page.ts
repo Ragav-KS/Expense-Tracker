@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { concatMap, from, map } from 'rxjs';
+import { concatMap, firstValueFrom, from, map } from 'rxjs';
+import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
 import { MailProcessorService } from 'src/app/services/Processors/Mail/mail-processor.service';
 import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
+import { Repository } from 'typeorm';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +20,22 @@ export class HomePage implements OnInit {
     private contentProcessorSrv: ContentProcessorService
   ) {}
 
-  ngOnInit(): void {}
+  private transactionsRepo!: Repository<Transaction>;
+
+  ngOnInit(): void {
+    this.loadRepo();
+  }
+
+  async loadRepo() {
+    if (!this.sqliteSrv.DBReady) {
+      await firstValueFrom(this.sqliteSrv.DBReadyEmitter);
+    }
+
+    this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
+      'Transaction'
+    ) as Repository<Transaction>;
+    console.info('>>>> [sqlite] Repository Loaded');
+  }
 
   async handleLogin() {
     await this.gmailSrv.login();
@@ -70,15 +87,18 @@ export class HomePage implements OnInit {
       });
   }
 
-  async handleTestDatabase() {
-    console.log(await this.sqliteSrv.query('SELECT * FROM [mails]'));
+  async handleDBCreate() {
+    const transaction = new Transaction();
+    transaction.amount = 1000;
 
-    console.log(
-      await this.sqliteSrv.execute(
-        `INSERT INTO [mails] ([id], [threadId]) VALUES ('aaa','bbb');`
-      )
-    );
+    await this.transactionsRepo.save(transaction);
+    console.log('Photo has been saved. Photo id is', transaction.id);
 
-    console.log(await this.sqliteSrv.query('SELECT * FROM [mails]'));
+    await this.sqliteSrv.saveDB();
+  }
+
+  async handleDBRead() {
+    const savedPhotos = await this.transactionsRepo.find();
+    console.log('All photos from the db: ', savedPhotos);
   }
 }
