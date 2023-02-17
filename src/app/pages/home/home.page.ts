@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { concatMap, firstValueFrom, from, map } from 'rxjs';
+import { concatMap, filter, firstValueFrom, from, map, tap } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/Content/content-processor.service';
@@ -50,6 +50,19 @@ export class HomePage implements OnInit {
         from(list)
           .pipe(
             map((mail) => mail.id!),
+            concatMap((mailId) =>
+              from(
+                this.transactionsRepo.findOneBy({
+                  id: mailId,
+                })
+              ).pipe(
+                filter((trns) => {
+                  return trns == null;
+                }),
+                map(() => mailId)
+              )
+            ),
+            tap((mailId) => console.log(mailId)),
             concatMap(async (mailId) => {
               return this.mailProcessorSrv.getMail(mailId);
             }),
@@ -81,24 +94,28 @@ export class HomePage implements OnInit {
                 ...result,
                 date: payloadText.date,
               };
+            }),
+            tap((payloadData: { [key: string]: string | null }) => {
+              const transaction = new Transaction();
+
+              transaction.id = payloadData['id']!;
+              transaction.amount = Number(payloadData['amount']);
+
+              this.transactionsRepo.save(transaction);
             })
           )
-          .subscribe(console.log);
+          .subscribe({
+            next: (val) => console.log(val),
+            complete: () => {
+              console.log('done');
+              this.sqliteSrv.saveDB();
+            },
+          });
       });
-  }
-
-  async handleDBCreate() {
-    const transaction = new Transaction();
-    transaction.amount = 1000;
-
-    await this.transactionsRepo.save(transaction);
-    console.log('Photo has been saved. Photo id is', transaction.id);
-
-    await this.sqliteSrv.saveDB();
   }
 
   async handleDBRead() {
     const savedPhotos = await this.transactionsRepo.find();
-    console.log('All photos from the db: ', savedPhotos);
+    console.log(savedPhotos);
   }
 }
