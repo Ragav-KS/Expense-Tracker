@@ -7,6 +7,7 @@ export class Transaction {
 
   @Column({
     type: 'float',
+    nullable: true,
   })
   amount!: number;
 
