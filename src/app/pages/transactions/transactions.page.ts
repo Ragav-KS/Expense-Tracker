@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { concatMap, filter, firstValueFrom, from } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
 import { Repository } from 'typeorm';
@@ -18,9 +18,16 @@ export class TransactionsPage implements OnInit {
 
   ngOnInit() {
     this.loadRepo().then(() => {
-      this.transactionsRepo.find().then((transactions) => {
-        this.transactionsList = transactions;
-      });
+      from(this.transactionsRepo.find())
+        .pipe(
+          concatMap((transactions) => from(transactions)),
+          filter((transaction) => {
+            return transaction['amount'] != null;
+          })
+        )
+        .subscribe((transaction) => {
+          this.transactionsList.push(transaction);
+        });
     });
   }
 
