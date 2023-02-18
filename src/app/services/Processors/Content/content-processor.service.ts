@@ -28,7 +28,7 @@ export class ContentProcessorService {
       let match = regexObj.regex.exec(payloadText);
 
       if (match) {
-        transaction.amount = Number(match.groups!['amount']);
+        transaction.amount = Number(match.groups!['amount'].replace(/,/g, ''));
         transaction.transactionType = regexObj['type'];
         transaction.account = match?.groups!['account'];
         transaction.mode = regexObj['mode'];
