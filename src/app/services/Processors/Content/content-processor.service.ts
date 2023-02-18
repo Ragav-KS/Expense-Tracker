@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Transaction } from 'src/app/entities/transaction';
 import { banksConfig } from 'src/res/banksConfig';
 
 @Injectable({
@@ -22,36 +23,22 @@ export class ContentProcessorService {
       .innerText;
   }
 
-  extractData(payloadText: string): {
-    [key: string]: string | null;
-  } {
-    let data: {
-      [key: string]: string | null;
-    } = {
-      amount: null,
-      type: null,
-      account: null,
-      mode: null,
-      party: null,
-      date: null,
-      time: null,
-    };
-
+  extractData(transaction: Transaction, payloadText: string): Transaction {
     for (let regexObj of this.regexObjects) {
       let match = regexObj.regex.exec(payloadText);
 
       if (match) {
-        data['amount'] = match.groups!['amount'];
-        data['type'] = regexObj['type'];
-        data['account'] = match?.groups!['account'];
-        data['mode'] = regexObj['mode'];
-        data['party'] = match.groups!['party'];
-        data['date'] = match.groups!['date'];
-        data['time'] = match.groups!['time'];
+        transaction.amount = Number(match.groups!['amount']);
+        transaction.transactionType = regexObj['type'];
+        transaction.account = match?.groups!['account'];
+        transaction.mode = regexObj['mode'];
+        transaction.party = match.groups!['party'];
+        // transaction.date = match.groups!['date'];
+        // transaction.time = match.groups!['time'];
         break;
       }
     }
 
-    return data;
+    return transaction;
   }
 }

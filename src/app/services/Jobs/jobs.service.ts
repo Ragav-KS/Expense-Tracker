@@ -58,32 +58,32 @@ export class JobsService {
       }),
       map((mail) => {
         let result = this.mailProcessorSrv.getPayload(mail);
-
+        let transaction = new Transaction();
+        transaction.id = mail.id!;
+        // transaction.date = result.date;
         return {
-          id: mail.id!,
+          transaction: transaction,
           body: result.body,
-          date: result.date,
         };
       }),
       map((payload) => {
         let result = this.contentProcessorSrv.extractText(payload.body);
 
         return {
-          id: payload.id,
+          transaction: payload.transaction,
           text: result,
-          date: payload.date,
         };
       }),
       map((payloadText) => {
-        let result = this.contentProcessorSrv.extractData(payloadText.text);
+        let transaction = this.contentProcessorSrv.extractData(
+          payloadText.transaction,
+          payloadText.text
+        );
 
-        return {
-          id: payloadText.id,
-          ...result,
-          date: payloadText.date,
-        } as {
-          [key: string]: string | null;
-        };
+        return transaction;
+      }),
+      tap((transaction) => {
+        this.transactionsRepo.save(transaction);
       })
     );
   }

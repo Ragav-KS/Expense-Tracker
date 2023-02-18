@@ -47,20 +47,8 @@ export class HomePage implements OnInit {
 
   async handlefetchMails() {
     this.jobsSrv.loadData().subscribe({
-      next: (val) => {
-        const transaction = new Transaction();
-
-        transaction.id = val['id']!;
-
-        transaction.amount = Number(val['amount']);
-        transaction.transactionType = val['type']!;
-        transaction.account = val['account']!;
-        transaction.mode = val['mode']!;
-        transaction.party = val['party']!;
-
-        this.transactionsRepo.save(transaction);
-
-        console.log(val);
+      next: (transaction) => {
+        console.log(transaction);
       },
       complete: () => {
         console.log('done');
