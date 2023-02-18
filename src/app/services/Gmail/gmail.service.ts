@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
 import { PreferenceStoreService } from '../Storage/Preferences/preference-store.service';
@@ -16,7 +16,7 @@ export class GmailService {
   private gapiLoaded = false;
   private gapiLoadedEmitter = new EventEmitter<void>();
 
-  public loggedIn = false;
+  public loggedIn = new BehaviorSubject<boolean>(false);
   public loginEmitter = new EventEmitter<void>();
 
   constructor(private prefSrv: PreferenceStoreService) {
@@ -57,7 +57,7 @@ export class GmailService {
       access_token: this.accessToken,
     });
 
-    this.loggedIn = true;
+    this.loggedIn.next(true);
     this.loginEmitter.emit();
 
     if (!this.gapiLoaded) {

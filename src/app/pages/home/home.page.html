@@ -13,7 +13,7 @@
 
   <div id="container">
     <ion-list>
-      <ion-item>
+      <ion-item *ngIf="!loggedIn">
         <ion-button (click)="handleLogin()">Login</ion-button>
       </ion-item>
       <ion-item>

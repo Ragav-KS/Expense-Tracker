@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { concatMap, filter, firstValueFrom, from, map, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
@@ -15,11 +15,11 @@ import { Repository } from 'typeorm';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit {
+  loggedIn = false;
+
   constructor(
     private gmailSrv: GmailService,
     private sqliteSrv: SqliteStorageService,
-    private mailProcessorSrv: MailProcessorService,
-    private contentProcessorSrv: ContentProcessorService,
     private jobsSrv: JobsService,
     private navCtrl: NavController
   ) {}
@@ -27,6 +27,10 @@ export class HomePage implements OnInit {
   private transactionsRepo!: Repository<Transaction>;
 
   ngOnInit(): void {
+    this.gmailSrv.loggedIn.subscribe((value) => {
+      this.loggedIn = value;
+    });
+
     this.loadRepo();
   }
 
