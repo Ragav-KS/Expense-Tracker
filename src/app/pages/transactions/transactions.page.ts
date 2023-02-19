@@ -37,7 +37,7 @@ export class TransactionsPage implements OnInit {
     }
 
     this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Transaction'
+      'Transactions'
     ) as Repository<Transaction>;
     console.info('>>>> [sqlite] Repository Loaded');
   }
