@@ -79,6 +79,13 @@ export class SqliteStorageService {
 
     console.info('>>>> [sqlite] Initializing DB');
 
+    // Close open connections before opening a new one. Workaround for CloseConnection error while debugging for android
+    CapacitorSQLite.closeConnection({
+      database: DB_NAME,
+    }).catch((err) => {
+      console.log('>>>> [sqlite] No open connection to close');
+    });
+
     this.AppDataSource = new DataSource({
       type: 'capacitor',
       driver: this.connection,
