@@ -25,8 +25,13 @@ export class TransactionsPage implements OnInit {
             return transaction['amount'] != null;
           })
         )
-        .subscribe((transaction) => {
-          this.transactionsList.push(transaction);
+        .subscribe({
+          next: (transaction) => {
+            this.transactionsList.push(transaction);
+          },
+          complete: () => {
+            console.log('>>>> [page] transactions loaded');
+          },
         });
     });
   }

@@ -8,16 +8,19 @@
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let transaction of transactionsList">
-      <ion-card>
-        <ion-label>
-          <h2>{{ transaction.party }}</h2>
-          <p>{{ transaction.amount }}</p>
-          <p>{{ transaction.mode }}</p>
-          <p>{{ transaction.transactionType }}</p>
-        </ion-label>
-      </ion-card>
+  <ion-list class="ion-padding">
+    <ion-item
+      *ngFor="let transaction of transactionsList"
+      lines="none"
+      [ngClass]="{ 'debit': transaction.transactionType === 'debit', 'credit': transaction.transactionType === 'credit' }"
+    >
+      <ion-label>
+        <h2>₹ {{ transaction.amount }}</h2>
+        <h3>{{ transaction.party }}</h3>
+      </ion-label>
+      <ion-label slot="end">
+        <p>{{ transaction.mode }}</p>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>
