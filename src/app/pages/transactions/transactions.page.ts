@@ -1,3 +1,4 @@
+import { KeyValue } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { concatMap, filter, firstValueFrom, from } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
@@ -11,6 +12,7 @@ import { Repository } from 'typeorm';
 })
 export class TransactionsPage implements OnInit {
   transactionsList: Transaction[] = [];
+  transactionsGrouped: Map<number, Transaction[]> = new Map();
 
   private transactionsRepo!: Repository<Transaction>;
 
@@ -18,7 +20,13 @@ export class TransactionsPage implements OnInit {
 
   ngOnInit() {
     this.loadRepo().then(() => {
-      from(this.transactionsRepo.find())
+      from(
+        this.transactionsRepo.find({
+          order: {
+            date: 'DESC',
+          },
+        })
+      )
         .pipe(
           concatMap((transactions) => from(transactions)),
           filter((transaction) => {
@@ -31,10 +39,35 @@ export class TransactionsPage implements OnInit {
           },
           complete: () => {
             console.log('>>>> [page] transactions loaded');
+            this.groupTransactions();
           },
         });
     });
   }
+
+  groupTransactions() {
+    this.transactionsList.forEach((transaction) => {
+      const date = transaction.date;
+      const dateKey = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      ).getTime();
+      const transactions = this.transactionsGrouped.get(dateKey);
+      if (transactions) {
+        transactions.push(transaction);
+      } else {
+        this.transactionsGrouped.set(dateKey, [transaction]);
+      }
+    });
+  }
+
+  keyDescOrder = (
+    a: KeyValue<number, any>,
+    b: KeyValue<number, any>
+  ): number => {
+    return a.key > b.key ? -1 : b.key > a.key ? 1 : 0;
+  };
 
   async loadRepo() {
     if (!this.sqliteSrv.DBReady) {
