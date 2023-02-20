@@ -1,5 +1,5 @@
 ion-item {
-  --background: #343434;
+  --background: var(--ion-color-step-150);
   --border-radius: 10px;
   --border-width: 0px 0px 0px 10px;
   --padding-top: 2px;
@@ -8,9 +8,9 @@ ion-item {
 }
 
 .debit {
-  --border-color: #c42700;
+  --border-color: var(--ion-color-danger);
 }
 
 .credit {
-  --border-color: #1aae00b0;
+  --border-color: var(--ion-color-success);
 }
