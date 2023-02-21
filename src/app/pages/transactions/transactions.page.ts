@@ -2,7 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { concatMap, filter, firstValueFrom, from } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
-import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
+import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 import { Repository } from 'typeorm';
 
 @Component({

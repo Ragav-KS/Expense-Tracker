@@ -16,10 +16,10 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     super();
   }
 
-  async initialize(options: {
+  public async initialize(options: {
     webClientID: string;
     androidClientID: string;
-  }): Promise<void> {
+  }) {
     this.clientId = options.webClientID;
 
     this.accessTokenEmitter = new EventEmitter();
@@ -37,7 +37,7 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
     });
   }
 
-  async getToken(options: {
+  public async getToken(options: {
     selectedAccount?: string;
   }): Promise<{ token: string }> {
     this.tokenClient.requestAccessToken({

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { banksConfig } from 'src/res/banksConfig';
 
@@ -8,11 +7,9 @@ import { banksConfig } from 'src/res/banksConfig';
 })
 export class ContentProcessorService {
   regexObjects: { mode: string; type: string; regex: RegExp }[];
-  private readonly parser!: DOMParser;
+  private readonly parser = new DOMParser();
 
   constructor() {
-    this.parser = new DOMParser();
-
     this.regexObjects = banksConfig.find(
       (item) => item.name === 'HDFC'
     )?.regexList!;

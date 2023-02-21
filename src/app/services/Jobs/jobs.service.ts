@@ -1,11 +1,19 @@
 import { Injectable } from '@angular/core';
-import { concatMap, filter, firstValueFrom, from, map, tap } from 'rxjs';
+import {
+  concatMap,
+  filter,
+  firstValueFrom,
+  from,
+  map,
+  Observable,
+  tap,
+} from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { Repository } from 'typeorm';
 import { GmailService } from '../Gmail/gmail.service';
-import { ContentProcessorService } from '../Processors/Content/content-processor.service';
-import { MailProcessorService } from '../Processors/Mail/mail-processor.service';
-import { SqliteStorageService } from '../Storage/SQLite/sqlite-storage.service';
+import { ContentProcessorService } from '../Processors/content-processor.service';
+import { MailProcessorService } from '../Processors/mail-processor.service';
+import { SqliteStorageService } from '../Storage/sqlite-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +41,7 @@ export class JobsService {
     console.info('>>>> [sqlite] Repository Loaded');
   }
 
-  loadData() {
+  loadData(): Observable<Transaction> {
     return from(
       this.mailProcessorSrv.getMailList(
         'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05'
@@ -54,7 +62,7 @@ export class JobsService {
         )
       ),
       concatMap(async (mailId) => {
-        return this.mailProcessorSrv.getMail(mailId);
+        return this.gmailSrv.getMail(mailId);
       }),
       map((mail) => {
         let result = this.mailProcessorSrv.getPayload(mail);

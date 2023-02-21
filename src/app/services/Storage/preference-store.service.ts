@@ -8,7 +8,7 @@ export class PreferenceStoreService {
   constructor() {}
 
   async get(key: string, defaultVal?: string): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       Preferences.get({ key: key })
         .then((result) => {
           resolve(result.value!);
@@ -19,8 +19,8 @@ export class PreferenceStoreService {
     });
   }
 
-  async set(key: string, value: string): Promise<void> {
-    return new Promise((resolve, reject) => {
+  async set(key: string, value: string) {
+    return new Promise<void>((resolve, reject) => {
       Preferences.set({ key: key, value: value })
         .then((result) => {
           resolve();

@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
-import { PreferenceStoreService } from '../Storage/Preferences/preference-store.service';
+import { PreferenceStoreService } from '../Storage/preference-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +24,7 @@ export class GmailService {
       androidClientID: credentials.androidClientID,
       webClientID: credentials.webClientID,
     });
+
     this.gapiLoadClient();
   }
 
@@ -44,7 +45,22 @@ export class GmailService {
     });
   }
 
-  public async loadToken(account?: string): Promise<string> {
+  public async getUserID(): Promise<string> {
+    let selectedUserID!: string;
+
+    await gapi.client.gmail.users
+      .getProfile({ userId: 'me' })
+      .then((res) => {
+        selectedUserID = res.result.emailAddress!;
+      })
+      .catch((err) => {
+        throw new Error('Failed to fetch user profile.' + err);
+      });
+
+    return selectedUserID;
+  }
+
+  public async loadToken(account?: string) {
     await GoogleAuth.getToken({
       selectedAccount: account,
     }).then((result) => {
@@ -61,31 +77,20 @@ export class GmailService {
     this.loginEmitter.emit();
 
     if (!this.gapiLoaded) {
-      console.info('>>>> [sqlite] Waiting for Gapi Client');
+      console.info('>>>> [GAuth] Waiting for Gapi Client');
       await firstValueFrom(this.gapiLoadedEmitter);
     }
-
-    let selectedUserID!: string;
-
-    await gapi.client.gmail.users
-      .getProfile({ userId: 'me' })
-      .then((res) => {
-        selectedUserID = res.result.emailAddress!;
-      })
-      .catch((err) => {
-        throw new Error('Failed to fetch user profile.' + err);
-      });
-
-    return selectedUserID;
   }
 
   async login() {
-    let userID: string = await this.prefSrv.get('userID');
+    let userID = await this.prefSrv.get('userID');
 
-    let result = await this.loadToken(userID);
+    await this.loadToken(userID);
 
-    console.info(`>>>> [GAuth] logged in as ${result}`);
-    await this.prefSrv.set('userID', result);
+    userID = await this.getUserID();
+
+    console.info(`>>>> [GAuth] logged in as ${userID}`);
+    await this.prefSrv.set('userID', userID);
   }
 
   public async getMailsList({
@@ -98,7 +103,7 @@ export class GmailService {
     pageToken?: string;
     labelIds?: string[];
     query?: string;
-  }): Promise<gapi.client.gmail.ListMessagesResponse> {
+  }) {
     let response!: gapi.client.Response<gapi.client.gmail.ListMessagesResponse>;
 
     await gapi.client.gmail.users.messages

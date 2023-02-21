@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { firstValueFrom, from } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
-import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
+import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
 import { Repository } from 'typeorm';
 
 @Component({

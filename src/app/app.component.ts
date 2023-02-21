@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
 import { GmailService } from './services/Gmail/gmail.service';
-import { PreferenceStoreService } from './services/Storage/Preferences/preference-store.service';
-import { SqliteStorageService } from './services/Storage/SQLite/sqlite-storage.service';
+import { SqliteStorageService } from './services/Storage/sqlite-storage.service';
 
 @Component({
   selector: 'app-root',
@@ -17,8 +16,7 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private gmailSrv: GmailService,
-    private sqliteSrv: SqliteStorageService,
-    private prefSrv: PreferenceStoreService
+    private sqliteSrv: SqliteStorageService
   ) {
     this.initializeApp();
   }
@@ -31,7 +29,7 @@ export class AppComponent {
 
       console.info(`>>>> Platform is ready - ${platform}`);
 
-      this.sqliteSrv.initializePlugin().then(async (ret) => {
+      this.sqliteSrv.initializeConnection().then(async () => {
         if (platform === 'web') {
           this.isWeb = true;
           await this.initializeJeepSqlite();

@@ -1,17 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import {
-  CapacitorSQLite,
-  CapacitorSQLitePlugin,
-  SQLiteConnection,
-  SQLiteDBConnection,
-} from '@capacitor-community/sqlite';
-import { Capacitor, CapacitorException } from '@capacitor/core';
+import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
+import { Capacitor } from '@capacitor/core';
 import { firstValueFrom } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { DataSource } from 'typeorm';
-import { PreferenceStoreService } from '../Preferences/preference-store.service';
 
-const DB_SETUP_KEY = 'first_db_setup';
 const DB_NAME = 'myDB';
 
 @Injectable({
@@ -22,7 +15,6 @@ export class SqliteStorageService {
   private native!: boolean;
 
   private connection!: SQLiteConnection;
-  private myDB!: SQLiteDBConnection;
   public AppDataSource!: DataSource;
 
   private connectionReady: boolean = false;
@@ -31,9 +23,9 @@ export class SqliteStorageService {
   public DBReady: boolean = false;
   public DBReadyEmitter = new EventEmitter<void>();
 
-  constructor(private prefSrv: PreferenceStoreService) {}
+  constructor() {}
 
-  async initializePlugin(): Promise<boolean> {
+  async initializeConnection() {
     this.platform = Capacitor.getPlatform();
 
     console.info('>>>> [sqlite] Initializing Sqlite Connection');
@@ -47,11 +39,9 @@ export class SqliteStorageService {
       console.info('>>>> [sqlite] Sqlite Connection Ready');
       this.connectionReadyEmitter.emit();
     }
-
-    return true;
   }
 
-  async initWebStore(): Promise<void> {
+  async initWebStore() {
     console.info('>>>> [sqlite] Initializing Web Store');
 
     if (this.connection != null) {
@@ -61,8 +51,6 @@ export class SqliteStorageService {
         this.connectionReady = true;
         console.info('>>>> [sqlite] Sqlite Connection Ready');
         this.connectionReadyEmitter.emit();
-
-        return;
       } catch (err) {
         throw err;
       }
@@ -80,7 +68,7 @@ export class SqliteStorageService {
     console.info('>>>> [sqlite] Initializing DB');
 
     // Close open connections before opening a new one. Workaround for CloseConnection error while debugging for android
-    CapacitorSQLite.closeConnection({
+    await CapacitorSQLite.closeConnection({
       database: DB_NAME,
     }).catch((err) => {
       console.log('>>>> [sqlite] No open connection to close');
@@ -107,29 +95,7 @@ export class SqliteStorageService {
     this.DBReadyEmitter.emit();
   }
 
-  async query(query: string) {
-    let result = await CapacitorSQLite.query({
-      database: DB_NAME,
-      statement: query,
-      values: [],
-    });
-
-    await this.saveDB();
-
-    return result;
-  }
-
-  async execute(statement: string) {
-    let result = await CapacitorSQLite.execute({
-      database: DB_NAME,
-      statements: statement,
-    });
-
-    await this.saveDB();
-
-    return result;
-  }
-
+  // This is for web implementation only
   async saveDB() {
     if (!this.native) {
       await CapacitorSQLite.saveToStore({
