@@ -1,47 +1,25 @@
 import { Injectable } from '@angular/core';
-import {
-  concatMap,
-  filter,
-  firstValueFrom,
-  from,
-  map,
-  Observable,
-  tap,
-} from 'rxjs';
+import { concatMap, filter, from, map, Observable, tap } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
-import { Repository } from 'typeorm';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
 import { MailProcessorService } from '../Processors/mail-processor.service';
-import { SqliteStorageService } from '../Storage/sqlite-storage.service';
+import { RepositoryService } from '../Repositories/repository.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class JobsService {
-  transactionsRepo!: Repository<Transaction>;
-
   constructor(
     private gmailSrv: GmailService,
-    private sqliteSrv: SqliteStorageService,
     private mailProcessorSrv: MailProcessorService,
-    private contentProcessorSrv: ContentProcessorService
-  ) {
-    this.loadRepo();
-  }
-
-  private async loadRepo() {
-    if (!this.sqliteSrv.DBReady) {
-      await firstValueFrom(this.sqliteSrv.DBReadyEmitter);
-    }
-
-    this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Transactions'
-    ) as Repository<Transaction>;
-    console.info('>>>> [sqlite] Repository Loaded');
-  }
+    private contentProcessorSrv: ContentProcessorService,
+    private repoSrvc: RepositoryService
+  ) {}
 
   loadData(): Observable<Transaction> {
+    let transactionsRepo = this.repoSrvc.transactionsRepo;
+
     return from(
       this.mailProcessorSrv.getMailList(
         'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05'
@@ -51,7 +29,7 @@ export class JobsService {
       map((mail) => mail.id!),
       concatMap((mailId) =>
         from(
-          this.transactionsRepo.findOneBy({
+          transactionsRepo.findOneBy({
             id: mailId,
           })
         ).pipe(
@@ -92,7 +70,7 @@ export class JobsService {
         return transaction;
       }),
       tap((transaction) => {
-        this.transactionsRepo.save(transaction);
+        transactionsRepo.save(transaction);
       })
     );
   }

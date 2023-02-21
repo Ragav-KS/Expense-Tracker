@@ -1,27 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
-import { Transaction } from 'src/app/entities/transaction';
+import { firstValueFrom, Subscribable, Subscription } from 'rxjs';
+import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
-import { Repository } from 'typeorm';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   constructor(
     private gmailSrv: GmailService,
     private sqliteSrv: SqliteStorageService,
     private jobsSrv: JobsService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private repoSrv: RepositoryService
   ) {}
 
-  private transactionsRepo!: Repository<Transaction>;
-
+  dataRefreshedSubscription!: Subscription;
   loggedIn = false;
 
   expensesSum: number = 0;
@@ -32,38 +31,43 @@ export class HomePage implements OnInit {
       this.loggedIn = value;
     });
 
-    this.loadRepo().then(() => {
-      return this.refresh();
-    });
+    if (this.repoSrv.repoLoaded) {
+      this.refresh();
+    } else {
+      firstValueFrom(this.repoSrv.repoLoadedEmitter).then(() => {
+        this.refresh();
+      });
+    }
+
+    this.dataRefreshedSubscription = this.repoSrv.dataRefreshed.subscribe(
+      () => {
+        this.refresh();
+      }
+    );
   }
 
-  async refresh() {
-    this.transactionsRepo
+  ngOnDestroy(): void {
+    this.dataRefreshedSubscription.unsubscribe();
+  }
+
+  refresh() {
+    let transactionsRepo = this.repoSrv.transactionsRepo;
+
+    transactionsRepo
       .sum('amount', {
         transactionType: 'debit',
       })
       .then((sum) => {
-        this.expensesSum = sum!;
+        this.expensesSum = sum ? sum : 0;
       });
 
-    this.transactionsRepo
+    transactionsRepo
       .sum('amount', {
         transactionType: 'credit',
       })
       .then((sum) => {
-        this.incomeSum = sum!;
+        this.incomeSum = sum ? sum : 0;
       });
-  }
-
-  async loadRepo() {
-    if (!this.sqliteSrv.DBReady) {
-      await firstValueFrom(this.sqliteSrv.DBReadyEmitter);
-    }
-
-    this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Transactions'
-    ) as Repository<Transaction>;
-    console.info('>>>> [sqlite] Repository Loaded');
   }
 
   async handleLogin() {
@@ -76,8 +80,9 @@ export class HomePage implements OnInit {
         console.log(transaction);
       },
       complete: () => {
-        console.log('done');
+        alert('Done');
         this.sqliteSrv.saveDB();
+        this.repoSrv.dataRefreshed.emit();
       },
     });
   }
