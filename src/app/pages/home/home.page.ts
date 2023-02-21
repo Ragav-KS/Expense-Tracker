@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import { firstValueFrom, from } from 'rxjs';
+import { Transaction } from 'src/app/entities/transaction';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { SqliteStorageService } from 'src/app/services/Storage/SQLite/sqlite-storage.service';
+import { Repository } from 'typeorm';
 
 @Component({
   selector: 'app-home',
@@ -17,12 +20,50 @@ export class HomePage implements OnInit {
     private navCtrl: NavController
   ) {}
 
+  private transactionsRepo!: Repository<Transaction>;
+
   loggedIn = false;
+
+  expensesSum: number = 0;
+  incomeSum: number = 0;
 
   ngOnInit(): void {
     this.gmailSrv.loggedIn.subscribe((value) => {
       this.loggedIn = value;
     });
+
+    this.loadRepo().then(() => {
+      return this.refresh();
+    });
+  }
+
+  async refresh() {
+    this.transactionsRepo
+      .sum('amount', {
+        transactionType: 'debit',
+      })
+      .then((sum) => {
+        this.expensesSum = sum!;
+      });
+
+    this.transactionsRepo
+      .sum('amount', {
+        transactionType: 'credit',
+      })
+      .then((sum) => {
+        this.incomeSum = sum!;
+      });
+  }
+
+  async loadRepo() {
+    if (!this.sqliteSrv.DBReady) {
+      await firstValueFrom(this.sqliteSrv.DBReadyEmitter);
+    }
+
+    this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
+      'Transactions'
+    ) as Repository<Transaction>;
+    console.info('>>>> [sqlite] Repository Loaded');
   }
 
   async handleLogin() {
