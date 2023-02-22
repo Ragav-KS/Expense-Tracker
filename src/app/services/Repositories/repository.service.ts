@@ -8,8 +8,8 @@ import { SqliteStorageService } from '../Storage/sqlite-storage.service';
   providedIn: 'root',
 })
 export class RepositoryService {
-  public repoLoaded = false;
-  public repoLoadedEmitter = new EventEmitter<void>();
+  private repoLoaded = false;
+  private repoLoadedEmitter = new EventEmitter<void>();
 
   public dataRefreshed = new EventEmitter<void>();
 
@@ -22,10 +22,15 @@ export class RepositoryService {
     });
   }
 
-  async loadRepo() {
-    if (!this.sqliteSrv.DBReady) {
-      await firstValueFrom(this.sqliteSrv.DBReadyEmitter);
+  async waitForRepo() {
+    if (!this.repoLoaded) {
+      console.info('>>>> [sqlite] Waiting for Repository');
+      await firstValueFrom(this.repoLoadedEmitter);
     }
+  }
+
+  async loadRepo() {
+    await this.sqliteSrv.waitForDB();
 
     this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
       'Transactions'

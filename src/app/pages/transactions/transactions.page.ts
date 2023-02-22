@@ -18,13 +18,9 @@ export class TransactionsPage implements OnInit, OnDestroy {
   constructor(private repoSrv: RepositoryService) {}
 
   ngOnInit() {
-    if (this.repoSrv.repoLoaded) {
+    this.repoSrv.waitForRepo().then(() => {
       this.refresh();
-    } else {
-      firstValueFrom(this.repoSrv.repoLoadedEmitter).then(() => {
-        this.refresh();
-      });
-    }
+    });
 
     this.dataRefreshedSubscription = this.repoSrv.dataRefreshed.subscribe(
       () => {

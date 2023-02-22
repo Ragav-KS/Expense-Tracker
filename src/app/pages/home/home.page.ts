@@ -31,13 +31,9 @@ export class HomePage implements OnInit, OnDestroy {
       this.loggedIn = value;
     });
 
-    if (this.repoSrv.repoLoaded) {
+    this.repoSrv.waitForRepo().then(() => {
       this.refresh();
-    } else {
-      firstValueFrom(this.repoSrv.repoLoadedEmitter).then(() => {
-        this.refresh();
-      });
-    }
+    });
 
     this.dataRefreshedSubscription = this.repoSrv.dataRefreshed.subscribe(
       () => {

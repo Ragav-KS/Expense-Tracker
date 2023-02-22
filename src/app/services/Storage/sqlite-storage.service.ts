@@ -20,10 +20,17 @@ export class SqliteStorageService {
   private connectionReady: boolean = false;
   private connectionReadyEmitter = new EventEmitter<void>();
 
-  public DBReady: boolean = false;
-  public DBReadyEmitter = new EventEmitter<void>();
+  private DBReady: boolean = false;
+  private DBReadyEmitter = new EventEmitter<void>();
 
   constructor() {}
+
+  async waitForDB() {
+    if (!this.DBReady) {
+      console.info('>>>> [sqlite] Waiting for DB');
+      await firstValueFrom(this.DBReadyEmitter);
+    }
+  }
 
   async initializeConnection() {
     this.platform = Capacitor.getPlatform();
