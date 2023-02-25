@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { CapacitorSQLite, SQLiteConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
 import { firstValueFrom } from 'rxjs';
+import { Party } from 'src/app/entities/party';
 import { Transaction } from 'src/app/entities/transaction';
 import { DataSource } from 'typeorm';
 
@@ -85,7 +86,7 @@ export class SqliteStorageService {
       type: 'capacitor',
       driver: this.connection,
       database: DB_NAME,
-      entities: [Transaction],
+      entities: [Transaction, Party],
       synchronize: true,
     });
 

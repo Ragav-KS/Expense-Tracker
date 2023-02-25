@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Party } from './party';
 
 @Entity({
   name: 'Transactions',
@@ -28,10 +29,13 @@ export class Transaction {
   })
   mode!: string;
 
-  @Column({
+  @ManyToOne(() => Party, (party) => party.id, {
+    cascade: ['insert'],
     nullable: true,
+    eager: true,
   })
-  party!: string;
+  @JoinColumn({ name: 'party' })
+  party!: Party;
 
   @Column({
     nullable: true,
