@@ -1,7 +1,10 @@
 export const banksConfig = [
   {
     name: 'HDFC',
-    gmailFilter: 'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-01',
+    gmailFilter: {
+      from: 'alerts@hdfcbank.net',
+      exclude: 'OTP is',
+    },
     regexList: [
       {
         mode: 'RD',

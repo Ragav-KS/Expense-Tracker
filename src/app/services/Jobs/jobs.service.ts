@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { concatMap, filter, from, map, Observable, tap } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
+import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
 import { MailProcessorService } from '../Processors/mail-processor.service';
@@ -10,12 +11,16 @@ import { RepositoryService } from '../Repositories/repository.service';
   providedIn: 'root',
 })
 export class JobsService {
+  private bankConfig!: typeof banksConfig[0];
+
   constructor(
     private gmailSrv: GmailService,
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService,
     private repoSrvc: RepositoryService
-  ) {}
+  ) {
+    this.bankConfig = banksConfig.find((item) => item.name === 'HDFC')!;
+  }
 
   loadData(): Observable<Transaction> {
     let transactionsRepo = this.repoSrvc.transactionsRepo;
@@ -26,9 +31,9 @@ export class JobsService {
     return from(
       this.mailProcessorSrv.getMailList(
         this.gmailSrv.buildQuery({
-          from: 'alerts@hdfcbank.net',
+          from: this.bankConfig.gmailFilter.from,
           after: startOfMonth,
-          exclude: 'OTP is',
+          exclude: this.bankConfig.gmailFilter.exclude,
         })
       )
     ).pipe(
