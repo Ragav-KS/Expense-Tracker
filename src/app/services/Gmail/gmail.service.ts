@@ -45,22 +45,18 @@ export class GmailService {
     });
   }
 
-  public async getUserID(): Promise<string> {
-    let selectedUserID!: string;
+  async login() {
+    let userID = await this.prefSrv.get('userID');
 
-    await gapi.client.gmail.users
-      .getProfile({ userId: 'me' })
-      .then((res) => {
-        selectedUserID = res.result.emailAddress!;
-      })
-      .catch((err) => {
-        throw new Error('Failed to fetch user profile.' + err);
-      });
+    await this.loadToken(userID);
 
-    return selectedUserID;
+    userID = await this.getUserID();
+
+    console.info(`>>>> [GAuth] logged in as ${userID}`);
+    await this.prefSrv.set('userID', userID);
   }
 
-  public async loadToken(account?: string) {
+  private async loadToken(account?: string) {
     await GoogleAuth.getToken({
       selectedAccount: account,
     }).then((result) => {
@@ -82,15 +78,19 @@ export class GmailService {
     }
   }
 
-  async login() {
-    let userID = await this.prefSrv.get('userID');
+  public async getUserID(): Promise<string> {
+    let selectedUserID!: string;
 
-    await this.loadToken(userID);
+    await gapi.client.gmail.users
+      .getProfile({ userId: 'me' })
+      .then((res) => {
+        selectedUserID = res.result.emailAddress!;
+      })
+      .catch((err) => {
+        throw new Error('Failed to fetch user profile.' + err);
+      });
 
-    userID = await this.getUserID();
-
-    console.info(`>>>> [GAuth] logged in as ${userID}`);
-    await this.prefSrv.set('userID', userID);
+    return selectedUserID;
   }
 
   public async getMailsList({
