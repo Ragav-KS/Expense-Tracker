@@ -11,6 +11,7 @@
             "url": "http://127.0.0.1:8100",
             "webRoot": "${workspaceFolder}",
             "userDataDir": false,
+            "sourceMaps": true,
             "port": 12345
         },
         {
