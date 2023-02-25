@@ -35,6 +35,7 @@
     "@types/google.accounts": "^0.0.5",
     "ionicons": "^6.0.3",
     "jeep-sqlite": "^1.7.0",
+    "moment": "^2.29.4",
     "reflect-metadata": "^0.1.13",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
