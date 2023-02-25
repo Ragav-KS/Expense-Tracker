@@ -20,9 +20,16 @@ export class JobsService {
   loadData(): Observable<Transaction> {
     let transactionsRepo = this.repoSrvc.transactionsRepo;
 
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+
     return from(
       this.mailProcessorSrv.getMailList(
-        'from: (alerts@hdfcbank.net) -"OTP is" after:2023-02-05'
+        this.gmailSrv.buildQuery({
+          from: 'alerts@hdfcbank.net',
+          after: startOfMonth,
+          exclude: 'OTP is',
+        })
       )
     ).pipe(
       concatMap((list) => from(list)),

@@ -1,4 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
+import moment from 'moment';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
@@ -91,6 +92,33 @@ export class GmailService {
       });
 
     return selectedUserID;
+  }
+
+  public buildQuery({
+    from,
+    after,
+    exclude,
+  }: {
+    from?: string;
+    exclude?: string;
+    after?: Date;
+  }): string {
+    let query = '';
+
+    if (from) {
+      query += `from: (${from}) `;
+    }
+
+    if (exclude) {
+      query += `-"${exclude}" `;
+    }
+
+    if (after) {
+      const dateString = moment(after).format('YYYY-MM-DD');
+      query += `after:${dateString} `;
+    }
+
+    return query.trim();
   }
 
   public async getMailsList({
