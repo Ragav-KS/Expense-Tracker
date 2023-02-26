@@ -1,8 +1,10 @@
 import { KeyValue } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { concatMap, filter, firstValueFrom, from, Subscription } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { TransactionEntryComponent } from './transaction-entry/transaction-entry.component';
 
 @Component({
   selector: 'app-transactions',
@@ -15,7 +17,10 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   private dataRefreshedSubscription!: Subscription;
 
-  constructor(private repoSrv: RepositoryService) {}
+  constructor(
+    private repoSrv: RepositoryService,
+    private modalCtrl: ModalController
+  ) {}
 
   ngOnInit() {
     this.repoSrv.waitForRepo().then(() => {
@@ -73,6 +78,24 @@ export class TransactionsPage implements OnInit, OnDestroy {
         this.transactionsGrouped.set(dateKey, [transaction]);
       }
     });
+  }
+
+  editTransaction(transaction: Transaction) {
+    // this.repoSrv.transactionsRepo.edit(transaction);
+    console.log('>>>> [page] edit transaction', transaction);
+    this.modalCtrl
+      .create({
+        component: TransactionEntryComponent,
+        componentProps: {
+          transaction: transaction,
+        },
+      })
+      .then((modal) => {
+        return modal.present();
+      })
+      .then((value) => {
+        console.log('>>>> [page] modal present', value);
+      });
   }
 
   keyDescOrder = (
