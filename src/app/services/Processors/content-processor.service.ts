@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Party } from 'src/app/entities/party';
 import { Transaction } from 'src/app/entities/transaction';
 import { banksConfig } from 'src/res/banksConfig';
 
@@ -29,7 +30,9 @@ export class ContentProcessorService {
         transaction.transactionType = regexObj['type'];
         transaction.account = match?.groups!['account'];
         transaction.mode = regexObj['mode'];
-        transaction.party = match.groups!['party'];
+
+        transaction.party = new Party();
+        transaction.party.id = match.groups!['party'];
         // transaction.date = match.groups!['date'];
         // transaction.time = match.groups!['time'];
         break;

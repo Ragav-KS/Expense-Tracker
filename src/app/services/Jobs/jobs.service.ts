@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Preferences } from '@capacitor/preferences';
-import moment from 'moment';
 import {
   catchError,
   concatMap,

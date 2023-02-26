@@ -1,5 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
+import { Party } from 'src/app/entities/party';
 import { Transaction } from 'src/app/entities/transaction';
 import { Repository } from 'typeorm';
 import { SqliteStorageService } from '../Storage/sqlite-storage.service';
@@ -14,6 +15,7 @@ export class RepositoryService {
   public dataRefreshed = new EventEmitter<void>();
 
   public transactionsRepo!: Repository<Transaction>;
+  public partiesRepo!: Repository<Party>;
 
   constructor(private sqliteSrv: SqliteStorageService) {
     this.loadRepo().then(() => {
@@ -35,6 +37,10 @@ export class RepositoryService {
     this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
       'Transactions'
     ) as Repository<Transaction>;
+
+    this.partiesRepo = this.sqliteSrv.AppDataSource.getRepository(
+      'Party'
+    ) as Repository<Party>;
 
     console.info('>>>> [sqlite] Repository Loaded');
   }
