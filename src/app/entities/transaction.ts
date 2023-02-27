@@ -30,7 +30,7 @@ export class Transaction {
   mode!: string;
 
   @ManyToOne(() => Party, (party) => party.id, {
-    cascade: ['insert'],
+    cascade: ['insert', 'update'],
     nullable: true,
     eager: true,
   })
