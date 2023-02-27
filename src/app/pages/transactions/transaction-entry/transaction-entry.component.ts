@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Transaction } from 'src/app/entities/transaction';
+import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
   selector: 'app-transaction-entry',
@@ -31,7 +32,10 @@ export class TransactionEntryComponent implements OnInit {
     transactionType: FormControl<string | null>;
   }>;
 
-  constructor(private modalCtrl: ModalController) {}
+  constructor(
+    private modalCtrl: ModalController,
+    private repoSrv: RepositoryService
+  ) {}
 
   ngOnInit() {
     this.partyControl = new FormControl(
@@ -57,9 +61,7 @@ export class TransactionEntryComponent implements OnInit {
     this.modalCtrl.dismiss();
   }
 
-  onSubmit() {
-    console.log(this.transactionForm.value);
-
+  async onSubmit() {
     if (this.transaction.party.id) {
       this.transaction.party.givenName = this.partyControl.value!;
     } else {
@@ -70,6 +72,8 @@ export class TransactionEntryComponent implements OnInit {
     this.transaction.date = this.dateControl.value!;
     this.transaction.mode = this.modeControl.value!;
     this.transaction.transactionType = this.transactionTypeControl.value!;
+
+    await this.repoSrv.transactionsRepo.save(this.transaction);
 
     this.modalCtrl.dismiss(this.transaction);
   }
