@@ -75,6 +75,8 @@ export class TransactionEntryComponent implements OnInit {
 
     await this.repoSrv.transactionsRepo.save(this.transaction);
 
+    await this.repoSrv.save();
+
     this.modalCtrl.dismiss(this.transaction);
   }
 }

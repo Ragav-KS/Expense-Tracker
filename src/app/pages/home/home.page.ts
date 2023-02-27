@@ -14,7 +14,6 @@ import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.se
 export class HomePage implements OnInit, OnDestroy {
   constructor(
     private gmailSrv: GmailService,
-    private sqliteSrv: SqliteStorageService,
     private jobsSrv: JobsService,
     private navCtrl: NavController,
     private repoSrv: RepositoryService
@@ -77,8 +76,7 @@ export class HomePage implements OnInit, OnDestroy {
       },
       complete: () => {
         alert('Done');
-        this.sqliteSrv.saveDB();
-        this.repoSrv.dataRefreshed.emit();
+        this.repoSrv.save();
       },
     });
   }

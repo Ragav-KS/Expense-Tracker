@@ -44,4 +44,9 @@ export class RepositoryService {
 
     console.info('>>>> [sqlite] Repository Loaded');
   }
+
+  async save() {
+    await this.sqliteSrv.saveDB();
+    this.dataRefreshed.emit();
+  }
 }

@@ -39,6 +39,9 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   refresh() {
+    this.transactionsList = [];
+    this.transactionsGrouped = new Map();
+
     from(
       this.repoSrv.transactionsRepo.find({
         order: {
