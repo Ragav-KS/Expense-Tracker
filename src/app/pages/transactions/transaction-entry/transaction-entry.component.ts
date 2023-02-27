@@ -60,7 +60,12 @@ export class TransactionEntryComponent implements OnInit {
   onSubmit() {
     console.log(this.transactionForm.value);
 
-    this.transaction.party.givenName = this.partyControl.value!;
+    if (this.transaction.party.id) {
+      this.transaction.party.givenName = this.partyControl.value!;
+    } else {
+      this.transaction.party.id = this.partyControl.value!;
+    }
+
     this.transaction.amount = this.amountControl.value!;
     this.transaction.date = this.dateControl.value!;
     this.transaction.mode = this.modeControl.value!;
