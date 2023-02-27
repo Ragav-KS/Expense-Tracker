@@ -81,8 +81,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   editTransaction(transaction: Transaction) {
-    // this.repoSrv.transactionsRepo.edit(transaction);
-    console.log('>>>> [page] edit transaction', transaction);
     this.modalCtrl
       .create({
         component: TransactionEntryComponent,
