@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { NavController, ToastController } from '@ionic/angular';
 import { firstValueFrom, Subscribable, Subscription } from 'rxjs';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
@@ -16,7 +16,8 @@ export class HomePage implements OnInit, OnDestroy {
     private gmailSrv: GmailService,
     private jobsSrv: JobsService,
     private navCtrl: NavController,
-    private repoSrv: RepositoryService
+    private repoSrv: RepositoryService,
+    private toastCtrl: ToastController
   ) {}
 
   dataRefreshedSubscription!: Subscription;
@@ -28,6 +29,35 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.gmailSrv.loggedIn.subscribe((value) => {
       this.loggedIn = value;
+
+      if (!value) {
+        this.toastCtrl
+          .create({
+            message: 'Please login',
+            duration: 0,
+            position: 'top',
+            cssClass: 'custom-toast',
+            id: 'login-toast',
+            buttons: [
+              {
+                role: 'login',
+                handler: () => {
+                  this.gmailSrv.login();
+                },
+                text: 'Login',
+              },
+              {
+                role: 'cancel',
+                text: 'Cancel',
+              },
+            ],
+          })
+          .then((toast) => {
+            toast.present();
+          });
+      } else {
+        this.toastCtrl.dismiss('login-toast');
+      }
     });
 
     this.repoSrv.waitForRepo().then(() => {
@@ -63,10 +93,6 @@ export class HomePage implements OnInit, OnDestroy {
       .then((sum) => {
         this.incomeSum = sum ? sum : 0;
       });
-  }
-
-  async handleLogin() {
-    await this.gmailSrv.login();
   }
 
   async handlefetchMails() {
