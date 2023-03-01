@@ -33,9 +33,7 @@
         <ion-button (click)="handlefetchMails()">Fetch mails</ion-button>
       </ion-item>
       <ion-item>
-        <ion-button (click)="handleGoToTransactions()"
-          >Go to Transactions</ion-button
-        >
+        <ion-button [href]="['/transactions']">Go to Transactions</ion-button>
       </ion-item>
     </ion-list>
   </div>

@@ -15,7 +15,6 @@ export class HomePage implements OnInit, OnDestroy {
   constructor(
     private gmailSrv: GmailService,
     private jobsSrv: JobsService,
-    private navCtrl: NavController,
     private repoSrv: RepositoryService,
     private toastCtrl: ToastController
   ) {}
@@ -105,9 +104,5 @@ export class HomePage implements OnInit, OnDestroy {
         this.repoSrv.save();
       },
     });
-  }
-
-  handleGoToTransactions() {
-    this.navCtrl.navigateForward('/transactions');
   }
 }
