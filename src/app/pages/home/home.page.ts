@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController, ToastController } from '@ionic/angular';
-import { firstValueFrom, Subscribable, Subscription } from 'rxjs';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { ToastController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
-import { SqliteStorageService } from 'src/app/services/Storage/sqlite-storage.service';
+import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +18,7 @@ export class HomePage implements OnInit, OnDestroy {
     private toastCtrl: ToastController
   ) {}
 
+  loggedInSubscription!: Subscription;
   dataRefreshedSubscription!: Subscription;
   loggedIn = false;
 
@@ -26,7 +26,7 @@ export class HomePage implements OnInit, OnDestroy {
   incomeSum: number = 0;
 
   ngOnInit(): void {
-    this.gmailSrv.loggedIn.subscribe((value) => {
+    this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe((value) => {
       this.loggedIn = value;
 
       if (!value) {
@@ -72,6 +72,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dataRefreshedSubscription.unsubscribe();
+    this.loggedInSubscription.unsubscribe();
   }
 
   refresh() {
