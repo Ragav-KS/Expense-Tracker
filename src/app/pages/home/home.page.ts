@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { IonRefresher, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
@@ -102,16 +102,23 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async handlefetchMails() {
-    this.jobsSrv.loadData().subscribe({
-      next: (transaction) => {
-        console.log(transaction);
-      },
-      complete: () => {
-        alert('Done');
-        this.repoSrv.save();
-      },
+    return new Promise<void>((resolve, reject) => {
+      this.jobsSrv.loadData().subscribe({
+        next: (transaction) => {
+          console.log(transaction);
+        },
+        complete: () => {
+          alert('Done');
+          this.repoSrv.save();
+          resolve();
+        },
+      });
     });
   }
 
-  handleRefresh(event: Event) {}
+  handleRefresh(event: Event) {
+    this.handlefetchMails().then(() => {
+      (event.target as HTMLIonRefresherElement).complete();
+    });
+  }
 }
