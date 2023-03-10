@@ -8,6 +8,16 @@
   transform: translateY(-50%);
 }
 
+ion-card {
+  border-radius: 10px;
+  --background: var(--ion-color-step-250);
+}
+
+#loginCard {
+  --color: #52ffe4;
+  --background: var(--ion-color-step-200);
+}
+
 #incomeCard h1 {
   color: #1eff00;
 }
