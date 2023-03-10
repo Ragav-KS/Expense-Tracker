@@ -101,14 +101,13 @@ export class HomePage implements OnInit, OnDestroy {
       });
   }
 
-  async handlefetchMails() {
+  async fetchMails() {
     return new Promise<void>((resolve, reject) => {
       this.jobsSrv.loadData().subscribe({
         next: (transaction) => {
           console.log(transaction);
         },
         complete: () => {
-          alert('Done');
           this.repoSrv.save();
           resolve();
         },
@@ -117,7 +116,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: Event) {
-    this.handlefetchMails().then(() => {
+    this.fetchMails().then(() => {
       (event.target as HTMLIonRefresherElement).complete();
     });
   }
