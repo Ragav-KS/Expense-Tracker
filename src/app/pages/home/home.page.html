@@ -22,7 +22,7 @@
   </ion-refresher>
 
   <ion-card id="loginCard" *ngIf="!loggedIn">
-    <ion-button fill="clear">Login</ion-button>
+    <ion-button fill="clear" (click)="handleLogin()">Login</ion-button>
   </ion-card>
 
   <div id="container">

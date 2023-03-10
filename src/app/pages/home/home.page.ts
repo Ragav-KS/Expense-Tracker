@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { IonRefresher, ToastController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
@@ -14,8 +13,7 @@ export class HomePage implements OnInit, OnDestroy {
   constructor(
     private gmailSrv: GmailService,
     private jobsSrv: JobsService,
-    private repoSrv: RepositoryService,
-    private toastCtrl: ToastController
+    private repoSrv: RepositoryService
   ) {}
 
   loggedInSubscription!: Subscription;
@@ -32,36 +30,6 @@ export class HomePage implements OnInit, OnDestroy {
     this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe(
       async (value) => {
         this.loggedIn = value;
-        console.log('>>>> [Toast] logged in: ' + value);
-
-        if (!value) {
-          this.loginToast = await this.toastCtrl.create({
-            message: 'Please login',
-            duration: 0,
-            position: 'top',
-            cssClass: 'custom-toast',
-            id: 'login-toast',
-            buttons: [
-              {
-                role: 'login',
-                handler: () => {
-                  this.gmailSrv.login();
-                },
-                text: 'Login',
-              },
-              {
-                role: 'cancel',
-                text: 'Cancel',
-              },
-            ],
-          });
-
-          console.log('>>>> [Toast] present');
-          await this.loginToast.present();
-        } else {
-          console.log('>>>> [Toast] dismiss');
-          await this.loginToast?.dismiss();
-        }
       }
     );
 
@@ -74,6 +42,10 @@ export class HomePage implements OnInit, OnDestroy {
         this.refresh();
       }
     );
+  }
+
+  handleLogin() {
+    this.gmailSrv.login();
   }
 
   ngOnDestroy(): void {
