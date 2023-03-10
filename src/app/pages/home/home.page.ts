@@ -20,18 +20,22 @@ export class HomePage implements OnInit, OnDestroy {
 
   loggedInSubscription!: Subscription;
   dataRefreshedSubscription!: Subscription;
+
   loggedIn = false;
+
+  loginToast: HTMLIonToastElement | undefined;
 
   expensesSum: number = 0;
   incomeSum: number = 0;
 
   ngOnInit(): void {
-    this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe((value) => {
-      this.loggedIn = value;
+    this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe(
+      async (value) => {
+        this.loggedIn = value;
+        console.log('>>>> [Toast] logged in: ' + value);
 
-      if (!value) {
-        this.toastCtrl
-          .create({
+        if (!value) {
+          this.loginToast = await this.toastCtrl.create({
             message: 'Please login',
             duration: 0,
             position: 'top',
@@ -50,14 +54,16 @@ export class HomePage implements OnInit, OnDestroy {
                 text: 'Cancel',
               },
             ],
-          })
-          .then((toast) => {
-            toast.present();
           });
-      } else {
-        this.toastCtrl.dismiss('login-toast');
+
+          console.log('>>>> [Toast] present');
+          await this.loginToast.present();
+        } else {
+          console.log('>>>> [Toast] dismiss');
+          await this.loginToast?.dismiss();
+        }
       }
-    });
+    );
 
     this.repoSrv.waitForRepo().then(() => {
       this.refresh();
@@ -106,4 +112,6 @@ export class HomePage implements OnInit, OnDestroy {
       },
     });
   }
+
+  handleRefresh(event: Event) {}
 }
