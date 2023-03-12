@@ -99,6 +99,19 @@ export class TransactionsPage implements OnInit, OnDestroy {
       });
   }
 
+  addTransaction() {
+    this.modalCtrl
+      .create({
+        component: TransactionFormComponent,
+      })
+      .then((modal) => {
+        return modal.present();
+      })
+      .then((value) => {
+        console.log('>>>> [page] modal present', value);
+      });
+  }
+
   keyDescOrder = (
     a: KeyValue<number, any>,
     b: KeyValue<number, any>
