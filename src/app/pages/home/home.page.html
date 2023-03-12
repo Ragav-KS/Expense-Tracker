@@ -29,11 +29,14 @@
     <section class="summary">
       <app-summary></app-summary>
     </section>
-  
-    <ion-list>
-      <ion-item>
-        <ion-button routerLink="/transactions">Go to Transactions</ion-button>
-      </ion-item>
-    </ion-list>
+
+    <ion-item
+      routerLink="/transactions"
+      detail="true"
+      lines="none"
+      color="primary"
+    >
+      Go to Transactions
+    </ion-item>
   </div>
 </ion-content>
