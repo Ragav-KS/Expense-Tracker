@@ -28,6 +28,7 @@
             "url": "http://localhost:8100/",
             "webRoot": "${workspaceFolder}",
             "profile": "dev-edition-default",
+            "keepProfileChanges": true
         }
     ]
 }
