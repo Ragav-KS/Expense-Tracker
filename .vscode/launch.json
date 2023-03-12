@@ -19,6 +19,15 @@
             "request": "attach",
             "name": "Attach to Android WebView",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "name": "Firefox",
+            "url": "http://localhost:8100/",
+            "webRoot": "${workspaceFolder}",
+            "profile": "dev-edition-default",
         }
     ]
 }
