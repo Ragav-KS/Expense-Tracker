@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
@@ -7,7 +7,7 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
   templateUrl: './summary.component.html',
   styleUrls: ['./summary.component.scss'],
 })
-export class SummaryComponent implements OnInit {
+export class SummaryComponent implements OnInit, OnDestroy {
   constructor(private repoSrv: RepositoryService) {}
 
   dataRefreshedSubscription!: Subscription;
@@ -25,6 +25,10 @@ export class SummaryComponent implements OnInit {
         this.refresh();
       }
     );
+  }
+
+  ngOnDestroy(): void {
+    this.dataRefreshedSubscription.unsubscribe();
   }
 
   refresh() {

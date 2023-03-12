@@ -32,16 +32,6 @@ export class HomePage implements OnInit, OnDestroy {
         this.loggedIn = value;
       }
     );
-
-    this.repoSrv.waitForRepo().then(() => {
-      this.refresh();
-    });
-
-    this.dataRefreshedSubscription = this.repoSrv.dataRefreshed.subscribe(
-      () => {
-        this.refresh();
-      }
-    );
   }
 
   handleLogin() {
@@ -49,28 +39,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.dataRefreshedSubscription.unsubscribe();
     this.loggedInSubscription.unsubscribe();
-  }
-
-  refresh() {
-    let transactionsRepo = this.repoSrv.transactionsRepo;
-
-    transactionsRepo
-      .sum('amount', {
-        transactionType: 'debit',
-      })
-      .then((sum) => {
-        this.expensesSum = sum ? sum : 0;
-      });
-
-    transactionsRepo
-      .sum('amount', {
-        transactionType: 'credit',
-      })
-      .then((sum) => {
-        this.incomeSum = sum ? sum : 0;
-      });
   }
 
   async fetchMails() {
