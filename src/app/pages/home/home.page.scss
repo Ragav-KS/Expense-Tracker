@@ -13,14 +13,14 @@ ion-card {
   --background: var(--ion-color-step-200);
 }
 
-#loginCard {
-  --color: #52ffe4;
-  --background: var(--ion-color-step-200);
-}
-
 ion-item {
   margin-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
   --border-radius: 10px;
+}
+
+#loginItem {
+  --color: #52ffe4;
+  --background: var(--ion-color-step-200);
 }

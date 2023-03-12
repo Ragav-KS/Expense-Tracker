@@ -21,9 +21,12 @@
     <ion-refresher-content> </ion-refresher-content>
   </ion-refresher>
 
-  <ion-card id="loginCard" *ngIf="!loggedIn">
-    <ion-button fill="clear" (click)="handleLogin()">Login</ion-button>
-  </ion-card>
+  <ion-item id="loginItem" *ngIf="!loggedIn" color="warning">
+    <ion-label>You're not logged in</ion-label>
+    <ion-button slot="end" fill="clear" (click)="handleLogin()"
+      >Login</ion-button
+    >
+  </ion-item>
 
   <div id="container">
     <section class="summary">
