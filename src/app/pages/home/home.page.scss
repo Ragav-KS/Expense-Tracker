@@ -8,10 +8,19 @@
   transform: translateY(-50%);
 }
 
-#incomeCard h1 {
-  color: #1eff00;
+ion-card {
+  border-radius: 15px;
+  --background: var(--ion-color-step-200);
 }
 
-#expenseCard h1 {
-  color: #ff0000;
+ion-item {
+  margin-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  --border-radius: 10px;
+}
+
+#loginItem {
+  --color: #52ffe4;
+  --background: var(--ion-color-step-200);
 }

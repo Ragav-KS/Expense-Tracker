@@ -21,27 +21,25 @@
     <ion-refresher-content> </ion-refresher-content>
   </ion-refresher>
 
+  <ion-item id="loginItem" *ngIf="!loggedIn" color="warning">
+    <ion-label>You're not logged in</ion-label>
+    <ion-button slot="end" fill="clear" (click)="handleLogin()"
+      >Login</ion-button
+    >
+  </ion-item>
+
   <div id="container">
-    <ion-card id="expenseCard">
-      <ion-card-header>
-        <ion-card-title>Expenses</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <h1>₹ {{expensesSum | number: '1.2-2'}}</h1>
-      </ion-card-content>
-    </ion-card>
-    <ion-card id="incomeCard">
-      <ion-card-header>
-        <ion-card-title>Income</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <h1>₹ {{incomeSum | number: '1.2-2'}}</h1>
-      </ion-card-content>
-    </ion-card>
-    <ion-list>
-      <ion-item>
-        <ion-button routerLink="/transactions">Go to Transactions</ion-button>
-      </ion-item>
-    </ion-list>
+    <section class="summary">
+      <app-summary></app-summary>
+    </section>
+
+    <ion-item
+      routerLink="/transactions"
+      detail="true"
+      lines="none"
+      color="primary"
+    >
+      Go to Transactions
+    </ion-item>
   </div>
 </ion-content>
