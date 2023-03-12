@@ -6,10 +6,10 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
 
 @Component({
   selector: 'app-transaction-entry',
-  templateUrl: './transaction-entry.component.html',
-  styleUrls: ['./transaction-entry.component.scss'],
+  templateUrl: './transaction-form.component.html',
+  styleUrls: ['./transaction-form.component.scss'],
 })
-export class TransactionEntryComponent implements OnInit {
+export class TransactionFormComponent implements OnInit {
   @Input() transaction: Transaction = new Transaction();
 
   public today = () => {

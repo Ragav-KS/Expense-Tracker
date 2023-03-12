@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { TransactionEntryComponent } from './transaction-entry.component';
+import { TransactionFormComponent } from './transaction-form.component';
 
-describe('TransactionEntryComponent', () => {
-  let component: TransactionEntryComponent;
-  let fixture: ComponentFixture<TransactionEntryComponent>;
+describe('TransactionFormComponent', () => {
+  let component: TransactionFormComponent;
+  let fixture: ComponentFixture<TransactionFormComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransactionEntryComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [TransactionFormComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(TransactionEntryComponent);
+    fixture = TestBed.createComponent(TransactionFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

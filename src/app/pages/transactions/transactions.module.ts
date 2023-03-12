@@ -7,7 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { TransactionsPageRoutingModule } from './transactions-routing.module';
 
 import { TransactionsPage } from './transactions.page';
-import { TransactionEntryComponent } from './transaction-entry/transaction-entry.component';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @NgModule({
   imports: [
@@ -17,6 +17,6 @@ import { TransactionEntryComponent } from './transaction-entry/transaction-entry
     TransactionsPageRoutingModule,
     ReactiveFormsModule,
   ],
-  declarations: [TransactionsPage, TransactionEntryComponent],
+  declarations: [TransactionsPage, TransactionFormComponent],
 })
 export class TransactionsPageModule {}
