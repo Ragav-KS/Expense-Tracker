@@ -27,22 +27,7 @@
 
   <div id="container">
     <section class="summary">
-      <ion-card id="expenseCard">
-        <ion-card-header>
-          <ion-card-title>Expenses</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <h1>₹ {{expensesSum | number: '1.2-2'}}</h1>
-        </ion-card-content>
-      </ion-card>
-      <ion-card id="incomeCard">
-        <ion-card-header>
-          <ion-card-title>Income</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <h1>₹ {{incomeSum | number: '1.2-2'}}</h1>
-        </ion-card-content>
-      </ion-card>
+      <app-summary></app-summary>
     </section>
   
     <ion-list>
