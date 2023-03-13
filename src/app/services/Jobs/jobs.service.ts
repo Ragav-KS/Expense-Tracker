@@ -80,7 +80,7 @@ export class JobsService {
         map((mail) => {
           let result = this.mailProcessorSrv.getPayload(mail);
           let transaction = new Transaction();
-          transaction.id = mail.id!;
+          // transaction.id = mail.id!;
           transaction.date = new Date(result.date);
 
           return {
