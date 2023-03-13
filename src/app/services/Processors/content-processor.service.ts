@@ -21,15 +21,20 @@ export class ContentProcessorService {
       .innerText;
   }
 
-  extractData(transaction: Transaction, payloadText: string): Transaction {
+  extractData(payloadText: string, mailDate: Date): Transaction | null {
+    let transaction: Transaction | null = null;
+
     for (let regexObj of this.regexObjects) {
       let match = regexObj.regex.exec(payloadText);
 
       if (match) {
+        transaction = new Transaction();
+
         transaction.amount = Number(match.groups!['amount'].replace(/,/g, ''));
         transaction.transactionType = regexObj['type'];
         transaction.account = match?.groups!['account'];
         transaction.mode = regexObj['mode'];
+        transaction.date = mailDate;
 
         transaction.party = new Party();
         transaction.party.id = match.groups!['party'];

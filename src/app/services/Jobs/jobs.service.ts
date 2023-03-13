@@ -10,7 +10,7 @@ import {
   tap,
   throwError,
 } from 'rxjs';
-import { Transaction } from 'src/app/entities/transaction';
+import { Mail } from 'src/app/entities/mail';
 import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
@@ -46,8 +46,8 @@ export class JobsService {
     });
   }
 
-  loadData(): Observable<Transaction> {
-    let transactionsRepo = this.repoSrvc.transactionsRepo;
+  loadMails(): Observable<Mail> {
+    let mailsRepo = this.repoSrvc.mailsRepo;
 
     let failed = false;
     return from(
@@ -64,7 +64,7 @@ export class JobsService {
         map((mail) => mail.id!),
         concatMap((mailId) =>
           from(
-            transactionsRepo.findOneBy({
+            mailsRepo.findOneBy({
               id: mailId,
             })
           ).pipe(
@@ -79,40 +79,36 @@ export class JobsService {
         }),
         map((mail) => {
           let result = this.mailProcessorSrv.getPayload(mail);
-          let transaction = new Transaction();
-          transaction.id = mail.id!;
-          transaction.date = new Date(result.date);
 
-          return {
-            transaction: transaction,
-            body: result.body,
-          };
-        }),
-        map((payload) => {
-          let result = this.contentProcessorSrv.extractText(payload.body);
+          let mailEntity = new Mail();
+          mailEntity.id = mail.id!;
+          mailEntity.meta_body = result.body;
+          mailEntity.date_meta = new Date(result.date);
 
-          return {
-            transaction: payload.transaction,
-            text: result,
-          };
+          return mailEntity;
         }),
-        map((payloadText) => {
-          let transaction = this.contentProcessorSrv.extractData(
-            payloadText.transaction,
-            payloadText.text
+        map((mail) => {
+          mail.meta_body = this.contentProcessorSrv.extractText(mail.meta_body);
+
+          return mail;
+        }),
+        map((mail) => {
+          mail.transaction = this.contentProcessorSrv.extractData(
+            mail.meta_body,
+            mail.date_meta
           );
 
-          return transaction;
+          return mail;
         }),
-        tap((transaction) => {
-          transactionsRepo.save(transaction);
+        tap((mail) => {
+          mailsRepo.save(mail);
         })
       )
       .pipe(
         catchError((err, caught) => {
           failed = true;
-          caught.subscribe((transaction) => {
-            console.log(`>>>> [JobsService] failed at ID: ${transaction.id}`);
+          caught.subscribe((mail) => {
+            console.log(`>>>> [JobsService] failed at ID: ${mail.id}`);
           });
 
           return throwError(() => err);
