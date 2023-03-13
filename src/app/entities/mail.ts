@@ -15,4 +15,6 @@ export class Mail {
   })
   @JoinColumn({ name: 'transaction' })
   transaction!: Transaction;
+
+  meta_body!: any;
 }
