@@ -96,7 +96,7 @@ export class JobsService {
           mail.transaction = this.contentProcessorSrv.extractData(
             mail.meta_body,
             mail.date_meta
-          )!;
+          );
 
           return mail;
         }),

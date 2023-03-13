@@ -14,7 +14,7 @@ export class Mail {
     eager: true,
   })
   @JoinColumn({ name: 'transaction' })
-  transaction!: Transaction;
+  transaction!: Transaction | null;
 
   date_meta!: Date;
   meta_body!: string;
