@@ -82,13 +82,10 @@ export class JobsService {
         map((mail) => {
           let result = this.mailProcessorSrv.getPayload(mail);
 
-          let transaction = new Transaction();
-          transaction.date = new Date(result.date);
-
           let mailEntity = new Mail();
           mailEntity.id = mail.id!;
-          mailEntity.transaction = transaction;
           mailEntity.meta_body = result.body;
+          mailEntity.date_meta = new Date(result.date);
 
           return mailEntity;
         }),
@@ -99,9 +96,9 @@ export class JobsService {
         }),
         map((mail) => {
           mail.transaction = this.contentProcessorSrv.extractData(
-            mail.transaction,
-            mail.meta_body
-          );
+            mail.meta_body,
+            mail.date_meta
+          )!;
 
           return mail;
         }),
