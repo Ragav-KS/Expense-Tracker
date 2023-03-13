@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Generated,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { Party } from './party';
 
 @Entity({
@@ -6,6 +13,7 @@ import { Party } from './party';
 })
 export class Transaction {
   @PrimaryColumn()
+  @Generated('uuid')
   id!: string;
 
   @Column({
