@@ -44,7 +44,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   async fetchMails() {
     return new Promise<void>((resolve, reject) => {
-      this.jobsSrv.loadData().subscribe({
+      this.jobsSrv.loadMails().subscribe({
         next: (transaction) => {
           console.log(transaction);
         },

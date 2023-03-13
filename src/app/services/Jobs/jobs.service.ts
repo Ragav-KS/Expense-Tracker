@@ -11,7 +11,6 @@ import {
   throwError,
 } from 'rxjs';
 import { Mail } from 'src/app/entities/mail';
-import { Transaction } from 'src/app/entities/transaction';
 import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
@@ -47,8 +46,7 @@ export class JobsService {
     });
   }
 
-  loadData(): Observable<Mail> {
-    let transactionsRepo = this.repoSrvc.transactionsRepo;
+  loadMails(): Observable<Mail> {
     let mailsRepo = this.repoSrvc.mailsRepo;
 
     let failed = false;
