@@ -16,5 +16,6 @@ export class Mail {
   @JoinColumn({ name: 'transaction' })
   transaction!: Transaction;
 
-  meta_body!: any;
+  date_meta!: Date;
+  meta_body!: string;
 }
