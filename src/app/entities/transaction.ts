@@ -18,35 +18,38 @@ export class Transaction {
 
   @Column({
     type: 'float',
-    nullable: true,
+    nullable: false,
   })
-  amount!: number;
+  amount: number = 0;
 
   @Column({
+    type: 'varchar',
     nullable: true,
   })
-  transactionType!: string;
+  transactionType: string | null = null;
 
   @Column({
+    type: 'varchar',
     nullable: true,
   })
-  account!: string;
+  account: string | null = null;
 
   @Column({
+    type: 'varchar',
     nullable: true,
   })
-  mode!: string;
+  mode: string | null = null;
 
   @ManyToOne(() => Party, (party) => party.id, {
     cascade: ['insert', 'update'],
-    nullable: true,
+    nullable: false,
     eager: true,
   })
   @JoinColumn({ name: 'party' })
-  party!: Party;
+  party: Party = new Party();
 
   @Column({
-    nullable: true,
+    nullable: false,
   })
-  date!: Date;
+  date: Date = new Date();
 }
