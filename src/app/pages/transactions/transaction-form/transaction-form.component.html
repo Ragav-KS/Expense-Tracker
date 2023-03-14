@@ -19,7 +19,7 @@
             <ion-input type="text" formControlName="party"></ion-input>
             <ion-note
               slot="end"
-              *ngIf="partyControl.errors?.['required'] && partyControl.touched"
+              *ngIf="partyControl.errors?.['required'] && (partyControl.dirty || partyControl.touched)"
               >Required</ion-note
             >
           </ion-item>
@@ -28,12 +28,12 @@
             <ion-input type="number" formControlName="amount"></ion-input>
             <ion-note
               slot="end"
-              *ngIf="amountControl.errors?.['min'] && amountControl.touched"
+              *ngIf="amountControl.errors?.['min']&& (amountControl.dirty || amountControl.touched)"
               >Minimum 1</ion-note
             >
             <ion-note
               slot="end"
-              *ngIf="amountControl.errors?.['required'] && amountControl.touched"
+              *ngIf="amountControl.errors?.['required'] && (amountControl.dirty || amountControl.touched)"
               >Required</ion-note
             >
           </ion-item>
