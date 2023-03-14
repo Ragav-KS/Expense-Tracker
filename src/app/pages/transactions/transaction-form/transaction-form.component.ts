@@ -66,6 +66,10 @@ export class TransactionFormComponent implements OnInit {
   }
 
   async onSubmit() {
+    if (!this.transactionForm.valid) {
+      this.transactionForm.markAllAsTouched();
+      return;
+    }
     if (this.transaction.party.id) {
       this.transaction.party.givenName = this.partyControl.value!;
     } else {
