@@ -4,7 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { concatMap, filter, firstValueFrom, from, Subscription } from 'rxjs';
 import { Transaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
-import { TransactionEntryComponent } from './transaction-entry/transaction-entry.component';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
   selector: 'app-transactions',
@@ -86,10 +86,23 @@ export class TransactionsPage implements OnInit, OnDestroy {
   editTransaction(transaction: Transaction) {
     this.modalCtrl
       .create({
-        component: TransactionEntryComponent,
+        component: TransactionFormComponent,
         componentProps: {
           transaction: transaction,
         },
+      })
+      .then((modal) => {
+        return modal.present();
+      })
+      .then((value) => {
+        console.log('>>>> [page] modal present', value);
+      });
+  }
+
+  addTransaction() {
+    this.modalCtrl
+      .create({
+        component: TransactionFormComponent,
       })
       .then((modal) => {
         return modal.present();

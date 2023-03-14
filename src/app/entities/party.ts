@@ -8,7 +8,8 @@ export class Party {
   id!: string;
 
   @Column({
+    type: 'varchar',
     nullable: true,
   })
-  givenName!: string;
+  givenName!: string | null;
 }

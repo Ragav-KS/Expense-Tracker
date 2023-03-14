@@ -1,15 +1,15 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Transaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
   selector: 'app-transaction-entry',
-  templateUrl: './transaction-entry.component.html',
-  styleUrls: ['./transaction-entry.component.scss'],
+  templateUrl: './transaction-form.component.html',
+  styleUrls: ['./transaction-form.component.scss'],
 })
-export class TransactionEntryComponent implements OnInit {
+export class TransactionFormComponent implements OnInit {
   @Input() transaction: Transaction = new Transaction();
 
   public today = () => {
@@ -39,9 +39,13 @@ export class TransactionEntryComponent implements OnInit {
 
   ngOnInit() {
     this.partyControl = new FormControl(
-      this.transaction.party.givenName || this.transaction.party.id
+      this.transaction.party.givenName || this.transaction.party.id,
+      [Validators.required]
     );
-    this.amountControl = new FormControl(this.transaction.amount);
+    this.amountControl = new FormControl(this.transaction.amount, [
+      Validators.min(1),
+      Validators.required,
+    ]);
     this.dateControl = new FormControl(this.transaction.date);
     this.modeControl = new FormControl(this.transaction.mode);
     this.transactionTypeControl = new FormControl(
@@ -62,6 +66,10 @@ export class TransactionEntryComponent implements OnInit {
   }
 
   async onSubmit() {
+    if (!this.transactionForm.valid) {
+      this.transactionForm.markAllAsTouched();
+      return;
+    }
     if (this.transaction.party.id) {
       this.transaction.party.givenName = this.partyControl.value!;
     } else {
