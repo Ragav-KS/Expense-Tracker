@@ -26,7 +26,7 @@ export class Transaction {
     type: 'varchar',
     nullable: true,
   })
-  transactionType: string | null = null;
+  transactionType: string | null = 'credit';
 
   @Column({
     type: 'varchar',
