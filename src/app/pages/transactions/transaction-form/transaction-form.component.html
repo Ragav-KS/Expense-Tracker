@@ -17,10 +17,25 @@
           <ion-item>
             <ion-label position="floating">Party</ion-label>
             <ion-input type="text" formControlName="party"></ion-input>
+            <ion-note
+              slot="end"
+              *ngIf="partyControl.errors?.['required'] && partyControl.touched"
+              >Required</ion-note
+            >
           </ion-item>
           <ion-item>
             <ion-label position="floating">Amount</ion-label>
             <ion-input type="number" formControlName="amount"></ion-input>
+            <ion-note
+              slot="end"
+              *ngIf="amountControl.errors?.['min'] && amountControl.touched"
+              >Minimum 1</ion-note
+            >
+            <ion-note
+              slot="end"
+              *ngIf="amountControl.errors?.['required'] && amountControl.touched"
+              >Required</ion-note
+            >
           </ion-item>
           <ion-item>
             <ion-label>Date</ion-label>

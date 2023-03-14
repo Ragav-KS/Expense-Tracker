@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { Transaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
@@ -39,9 +39,13 @@ export class TransactionFormComponent implements OnInit {
 
   ngOnInit() {
     this.partyControl = new FormControl(
-      this.transaction.party.givenName || this.transaction.party.id
+      this.transaction.party.givenName || this.transaction.party.id,
+      [Validators.required]
     );
-    this.amountControl = new FormControl(this.transaction.amount);
+    this.amountControl = new FormControl(this.transaction.amount, [
+      Validators.min(1),
+      Validators.required,
+    ]);
     this.dateControl = new FormControl(this.transaction.date);
     this.modeControl = new FormControl(this.transaction.mode);
     this.transactionTypeControl = new FormControl(
