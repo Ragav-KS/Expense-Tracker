@@ -20,7 +20,7 @@ export class Transaction {
     type: 'float',
     nullable: false,
   })
-  amount: number = 0;
+  amount: number = 1;
 
   @Column({
     type: 'varchar',
