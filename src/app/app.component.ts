@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
 import { GmailService } from './services/Gmail/gmail.service';
+import { PreferenceStoreService } from './services/Storage/preference-store.service';
 import { SqliteStorageService } from './services/Storage/sqlite-storage.service';
 
 @Component({
@@ -16,7 +17,8 @@ export class AppComponent {
   constructor(
     private platform: Platform,
     private gmailSrv: GmailService,
-    private sqliteSrv: SqliteStorageService
+    private sqliteSrv: SqliteStorageService,
+    private prefSrv: PreferenceStoreService
   ) {
     this.initializeApp();
   }
@@ -39,7 +41,9 @@ export class AppComponent {
       });
 
       if (platform !== 'web') {
-        await this.gmailSrv.login();
+        if (await this.prefSrv.get('userID')) {
+          await this.gmailSrv.login();
+        }
       }
     });
   }
