@@ -112,6 +112,8 @@ export class TransactionsPage implements OnInit, OnDestroy {
       });
   }
 
+  deleteTransaction(transaction: Transaction) {}
+
   keyDescOrder = (
     a: KeyValue<number, any>,
     b: KeyValue<number, any>
