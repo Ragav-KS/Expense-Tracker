@@ -112,6 +112,12 @@ export class TransactionsPage implements OnInit, OnDestroy {
       });
   }
 
+  deleteTransaction(transaction: Transaction) {
+    this.repoSrv.transactionsRepo.remove(transaction).then(() => {
+      this.repoSrv.save();
+    });
+  }
+
   keyDescOrder = (
     a: KeyValue<number, any>,
     b: KeyValue<number, any>
