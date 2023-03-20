@@ -22,6 +22,7 @@ export const MailEntity = new EntitySchema<IMail>({
       nullable: true,
       type: 'one-to-one',
       cascade: ['insert', 'update'],
+      onDelete: 'SET NULL',
       joinColumn: true,
       eager: true,
     },
