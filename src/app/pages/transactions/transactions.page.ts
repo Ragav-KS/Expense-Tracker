@@ -39,8 +39,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   refresh() {
-    this.transactionsGrouped = new Map();
-
     this.repoSrv.transactionsRepo
       .find({
         order: {
@@ -55,6 +53,8 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   groupTransactions() {
+    let transactionsGrouped = new Map();
+
     this.transactionsList.forEach((transaction) => {
       const date = transaction.date;
       const dateKey = new Date(
@@ -62,13 +62,15 @@ export class TransactionsPage implements OnInit, OnDestroy {
         date.getMonth(),
         date.getDate()
       ).getTime();
-      const transactions = this.transactionsGrouped.get(dateKey);
+      const transactions = transactionsGrouped.get(dateKey);
       if (transactions) {
         transactions.push(transaction);
       } else {
-        this.transactionsGrouped.set(dateKey, [transaction]);
+        transactionsGrouped.set(dateKey, [transaction]);
       }
     });
+
+    this.transactionsGrouped = transactionsGrouped;
   }
 
   editTransaction(transaction: ITransaction) {
