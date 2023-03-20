@@ -1,7 +1,7 @@
 import { KeyValue } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { concatMap, filter, firstValueFrom, from, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
@@ -39,30 +39,18 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   refresh() {
-    this.transactionsList = [];
     this.transactionsGrouped = new Map();
 
-    from(
-      this.repoSrv.transactionsRepo.find({
+    this.repoSrv.transactionsRepo
+      .find({
         order: {
           date: 'DESC',
         },
       })
-    )
-      .pipe(
-        concatMap((transactions) => from(transactions)),
-        filter((transaction) => {
-          return transaction['amount'] != null;
-        })
-      )
-      .subscribe({
-        next: (transaction) => {
-          this.transactionsList.push(transaction);
-        },
-        complete: () => {
-          console.log('>>>> [page] transactions loaded');
-          this.groupTransactions();
-        },
+      .then((transactions) => {
+        this.transactionsList = transactions;
+        console.log('>>>> [page] transactions loaded');
+        this.groupTransactions();
       });
   }
 
