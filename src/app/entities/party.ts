@@ -1,15 +1,20 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { EntitySchema } from 'typeorm';
 
-@Entity({
-  name: 'Party',
-})
-export class Party {
-  @PrimaryColumn()
-  id!: string;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  givenName!: string | null;
+export interface IParty {
+  id: string;
+  givenName?: string | null;
 }
+
+export const PartyEntity = new EntitySchema<IParty>({
+  name: 'Party',
+  columns: {
+    id: {
+      type: String,
+      primary: true,
+    },
+    givenName: {
+      type: String,
+      nullable: true,
+    },
+  },
+});

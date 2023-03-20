@@ -1,55 +1,57 @@
-import {
-  Column,
-  Entity,
-  Generated,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
-import { Party } from './party';
+import { EntitySchema } from 'typeorm';
+import { IParty } from './party';
 
-@Entity({
-  name: 'Transactions',
-})
-export class Transaction {
-  @PrimaryColumn()
-  @Generated('uuid')
-  id!: string;
-
-  @Column({
-    type: 'float',
-    nullable: false,
-  })
-  amount: number = 1;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  transactionType: string | null = 'credit';
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  account: string | null = null;
-
-  @Column({
-    type: 'varchar',
-    nullable: true,
-  })
-  mode: string | null = null;
-
-  @ManyToOne(() => Party, (party) => party.id, {
-    cascade: ['insert', 'update'],
-    nullable: false,
-    eager: true,
-  })
-  @JoinColumn({ name: 'party' })
-  party: Party = new Party();
-
-  @Column({
-    nullable: false,
-  })
-  date: Date = new Date();
+export interface ITransaction {
+  id?: string;
+  amount: number;
+  transactionType: string;
+  account?: string | null;
+  mode?: string | null;
+  party: IParty;
+  date: Date;
 }
+
+export const TransactionEntity = new EntitySchema<ITransaction>({
+  name: 'Transactions',
+  columns: {
+    id: {
+      type: String,
+      primary: true,
+      generated: 'uuid',
+    },
+    amount: {
+      type: 'float',
+      nullable: false,
+      default: 1,
+    },
+    transactionType: {
+      type: String,
+      nullable: false,
+      default: 'credit',
+    },
+    account: {
+      type: String,
+      nullable: true,
+    },
+    mode: {
+      type: String,
+      nullable: true,
+    },
+    date: {
+      type: Date,
+      nullable: false,
+      default: 'NOW()',
+    },
+  },
+  relations: {
+    party: {
+      target: 'Party',
+      nullable: false,
+      default: {} as IParty,
+      type: 'many-to-one',
+      cascade: ['insert', 'update'],
+      joinColumn: true,
+      eager: true,
+    },
+  },
+});

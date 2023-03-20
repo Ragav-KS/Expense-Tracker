@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-import { Transaction } from 'src/app/entities/transaction';
+import { ITransaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
@@ -10,7 +10,12 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
   styleUrls: ['./transaction-form.component.scss'],
 })
 export class TransactionFormComponent implements OnInit {
-  @Input() transaction: Transaction = new Transaction();
+  @Input() transaction: ITransaction = {
+    amount: 1,
+    date: new Date(),
+    party: { id: '' },
+    transactionType: 'credit',
+  };
 
   public today = () => {
     let t = new Date();
@@ -39,7 +44,7 @@ export class TransactionFormComponent implements OnInit {
 
   ngOnInit() {
     this.partyControl = new FormControl(
-      this.transaction.party.givenName || this.transaction.party.id,
+      this.transaction.party.givenName! || this.transaction.party.id,
       [Validators.required]
     );
     this.amountControl = new FormControl(this.transaction.amount, [
@@ -47,7 +52,7 @@ export class TransactionFormComponent implements OnInit {
       Validators.required,
     ]);
     this.dateControl = new FormControl(this.transaction.date);
-    this.modeControl = new FormControl(this.transaction.mode);
+    this.modeControl = new FormControl(this.transaction.mode!);
     this.transactionTypeControl = new FormControl(
       this.transaction.transactionType
     );
@@ -70,6 +75,7 @@ export class TransactionFormComponent implements OnInit {
       this.transactionForm.markAllAsTouched();
       return;
     }
+
     if (this.transaction.party.id) {
       this.transaction.party.givenName = this.partyControl.value!;
     } else {

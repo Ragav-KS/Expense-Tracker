@@ -7,10 +7,9 @@ import {
   from,
   map,
   Observable,
-  tap,
   throwError,
 } from 'rxjs';
-import { Mail } from 'src/app/entities/mail';
+import { IMail } from 'src/app/entities/mail';
 import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
@@ -46,7 +45,7 @@ export class JobsService {
     });
   }
 
-  loadMails(): Observable<Mail> {
+  loadMails(): Observable<IMail> {
     let mailsRepo = this.repoSrvc.mailsRepo;
 
     let failed = false;
@@ -80,28 +79,31 @@ export class JobsService {
         map((mail) => {
           let result = this.mailProcessorSrv.getPayload(mail);
 
-          let mailEntity = new Mail();
-          mailEntity.id = mail.id!;
-          mailEntity.meta_body = result.body;
-          mailEntity.date_meta = new Date(result.date);
+          let mailEntity: IMail = {
+            id: mail.id!,
+            meta_body: result.body,
+            date_meta: new Date(result.date),
+          };
 
           return mailEntity;
         }),
         map((mail) => {
-          mail.meta_body = this.contentProcessorSrv.extractText(mail.meta_body);
+          mail.meta_body = this.contentProcessorSrv.extractText(
+            mail.meta_body!
+          );
 
           return mail;
         }),
         map((mail) => {
           mail.transaction = this.contentProcessorSrv.extractData(
-            mail.meta_body,
-            mail.date_meta
+            mail.meta_body!,
+            mail.date_meta!
           );
 
           return mail;
         }),
-        tap((mail) => {
-          mailsRepo.save(mail);
+        concatMap((mail) => {
+          return mailsRepo.save(mail);
         })
       )
       .pipe(

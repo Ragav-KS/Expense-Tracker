@@ -25,7 +25,7 @@
             <h3>{{ transaction.party.givenName || transaction.party.id }}</h3>
           </ion-label>
           <ion-label slot="end">
-            <p>{{ transaction.mode }}</p>
+            <p>{{ transaction.mode || '' }}</p>
           </ion-label>
         </ion-item>
 

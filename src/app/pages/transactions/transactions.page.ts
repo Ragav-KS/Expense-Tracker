@@ -2,7 +2,7 @@ import { KeyValue } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { concatMap, filter, firstValueFrom, from, Subscription } from 'rxjs';
-import { Transaction } from 'src/app/entities/transaction';
+import { ITransaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
@@ -12,8 +12,8 @@ import { TransactionFormComponent } from './transaction-form/transaction-form.co
   styleUrls: ['./transactions.page.scss'],
 })
 export class TransactionsPage implements OnInit, OnDestroy {
-  transactionsList: Transaction[] = [];
-  transactionsGrouped: Map<number, Transaction[]> = new Map();
+  transactionsList: ITransaction[] = [];
+  transactionsGrouped: Map<number, ITransaction[]> = new Map();
 
   private dataRefreshedSubscription!: Subscription;
 
@@ -83,7 +83,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
     });
   }
 
-  editTransaction(transaction: Transaction) {
+  editTransaction(transaction: ITransaction) {
     this.modalCtrl
       .create({
         component: TransactionFormComponent,
@@ -112,7 +112,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
       });
   }
 
-  deleteTransaction(transaction: Transaction) {
+  deleteTransaction(transaction: ITransaction) {
     this.repoSrv.transactionsRepo.remove(transaction).then(() => {
       this.repoSrv.save();
     });
