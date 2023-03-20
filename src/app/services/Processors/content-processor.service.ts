@@ -27,16 +27,17 @@ export class ContentProcessorService {
       let match = regexObj.regex.exec(payloadText);
 
       if (match) {
-        transaction = {};
+        transaction = {
+          amount: Number(match.groups!['amount'].replace(/,/g, '')),
+          transactionType: regexObj['type'],
+          account: match.groups!['account'],
+          mode: regexObj['mode'],
+          date: mailDate,
+          party: {
+            id: match.groups!['party'],
+          },
+        };
 
-        transaction.amount = Number(match.groups!['amount'].replace(/,/g, ''));
-        transaction.transactionType = regexObj['type'];
-        transaction.account = match?.groups!['account'];
-        transaction.mode = regexObj['mode'];
-        transaction.date = mailDate;
-
-        transaction.party = {};
-        transaction.party.id = match.groups!['party'];
         // transaction.date = match.groups!['date'];
         // transaction.time = match.groups!['time'];
         break;

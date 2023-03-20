@@ -10,7 +10,12 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
   styleUrls: ['./transaction-form.component.scss'],
 })
 export class TransactionFormComponent implements OnInit {
-  @Input() transaction: ITransaction = {};
+  @Input() transaction: ITransaction = {
+    amount: 1,
+    date: new Date(),
+    party: { id: '' },
+    transactionType: 'credit',
+  };
 
   public today = () => {
     let t = new Date();
@@ -39,17 +44,17 @@ export class TransactionFormComponent implements OnInit {
 
   ngOnInit() {
     this.partyControl = new FormControl(
-      this.transaction.party!.givenName! || this.transaction.party!.id!,
+      this.transaction.party.givenName! || this.transaction.party.id,
       [Validators.required]
     );
-    this.amountControl = new FormControl(this.transaction.amount!, [
+    this.amountControl = new FormControl(this.transaction.amount, [
       Validators.min(1),
       Validators.required,
     ]);
-    this.dateControl = new FormControl(this.transaction.date!);
+    this.dateControl = new FormControl(this.transaction.date);
     this.modeControl = new FormControl(this.transaction.mode!);
     this.transactionTypeControl = new FormControl(
-      this.transaction.transactionType!
+      this.transaction.transactionType
     );
 
     this.transactionForm = new FormGroup({
@@ -70,10 +75,11 @@ export class TransactionFormComponent implements OnInit {
       this.transactionForm.markAllAsTouched();
       return;
     }
-    if (this.transaction.party!.id) {
-      this.transaction.party!.givenName = this.partyControl.value!;
+
+    if (this.transaction.party.id) {
+      this.transaction.party.givenName = this.partyControl.value!;
     } else {
-      this.transaction.party!.id = this.partyControl.value!;
+      this.transaction.party.id = this.partyControl.value!;
     }
 
     this.transaction.amount = this.amountControl.value!;

@@ -1,7 +1,7 @@
 import { EntitySchema } from 'typeorm';
 
 export interface IParty {
-  id?: string;
+  id: string;
   givenName?: string | null;
 }
 

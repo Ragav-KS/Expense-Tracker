@@ -2,7 +2,7 @@ import { EntitySchema } from 'typeorm';
 import { ITransaction } from './transaction';
 
 export interface IMail {
-  id?: string;
+  id: string;
   transaction?: ITransaction | null;
   date_meta?: Date;
   meta_body?: string;
@@ -19,10 +19,10 @@ export const MailEntity = new EntitySchema<IMail>({
   relations: {
     transaction: {
       target: 'Transactions',
-      type: 'one-to-one',
-      joinColumn: true,
-      cascade: ['insert', 'update'],
       nullable: true,
+      type: 'one-to-one',
+      cascade: ['insert', 'update'],
+      joinColumn: true,
       eager: true,
     },
   },

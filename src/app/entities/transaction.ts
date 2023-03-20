@@ -3,12 +3,12 @@ import { IParty } from './party';
 
 export interface ITransaction {
   id?: string;
-  amount?: number;
-  transactionType?: string | null;
+  amount: number;
+  transactionType: string;
   account?: string | null;
   mode?: string | null;
-  party?: IParty;
-  date?: Date;
+  party: IParty;
+  date: Date;
 }
 
 export const TransactionEntity = new EntitySchema<ITransaction>({
@@ -26,7 +26,7 @@ export const TransactionEntity = new EntitySchema<ITransaction>({
     },
     transactionType: {
       type: String,
-      nullable: true,
+      nullable: false,
       default: 'credit',
     },
     account: {
@@ -46,9 +46,11 @@ export const TransactionEntity = new EntitySchema<ITransaction>({
   relations: {
     party: {
       target: 'Party',
+      nullable: false,
+      default: {} as IParty,
       type: 'many-to-one',
-      joinColumn: true,
       cascade: ['insert', 'update'],
+      joinColumn: true,
       eager: true,
     },
   },

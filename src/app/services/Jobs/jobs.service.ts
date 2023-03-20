@@ -11,7 +11,6 @@ import {
 } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { banksConfig } from 'src/res/banksConfig';
-import { Equal } from 'typeorm';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
 import { MailProcessorService } from '../Processors/mail-processor.service';
@@ -65,7 +64,7 @@ export class JobsService {
         concatMap((mailId) =>
           from(
             mailsRepo.findOneBy({
-              id: Equal(mailId),
+              id: mailId,
             })
           ).pipe(
             filter((trns) => {

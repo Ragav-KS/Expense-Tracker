@@ -68,7 +68,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   groupTransactions() {
     this.transactionsList.forEach((transaction) => {
-      const date = transaction.date!;
+      const date = transaction.date;
       const dateKey = new Date(
         date.getFullYear(),
         date.getMonth(),
