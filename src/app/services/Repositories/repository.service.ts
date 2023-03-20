@@ -1,8 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Mail } from 'src/app/entities/mail';
-import { Party } from 'src/app/entities/party';
-import { Transaction } from 'src/app/entities/transaction';
+import { IMail, MailEntity } from 'src/app/entities/mail';
+import { IParty, PartyEntity } from 'src/app/entities/party';
+import { ITransaction, TransactionEntity } from 'src/app/entities/transaction';
 import { Repository } from 'typeorm';
 import { SqliteStorageService } from '../Storage/sqlite-storage.service';
 
@@ -15,9 +15,9 @@ export class RepositoryService {
 
   public dataRefreshed = new EventEmitter<void>();
 
-  public mailsRepo!: Repository<Mail>;
-  public transactionsRepo!: Repository<Transaction>;
-  public partiesRepo!: Repository<Party>;
+  public mailsRepo!: Repository<IMail>;
+  public transactionsRepo!: Repository<ITransaction>;
+  public partiesRepo!: Repository<IParty>;
 
   constructor(private sqliteSrv: SqliteStorageService) {
     this.loadRepo().then(() => {
@@ -36,17 +36,12 @@ export class RepositoryService {
   async loadRepo() {
     await this.sqliteSrv.waitForDB();
 
-    this.transactionsRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Transactions'
-    ) as Repository<Transaction>;
+    this.transactionsRepo =
+      this.sqliteSrv.AppDataSource.getRepository(TransactionEntity);
 
-    this.partiesRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Party'
-    ) as Repository<Party>;
+    this.partiesRepo = this.sqliteSrv.AppDataSource.getRepository(PartyEntity);
 
-    this.mailsRepo = this.sqliteSrv.AppDataSource.getRepository(
-      'Mails'
-    ) as Repository<Mail>;
+    this.mailsRepo = this.sqliteSrv.AppDataSource.getRepository(MailEntity);
 
     console.info('>>>> [sqlite] Repository Loaded');
   }

@@ -41,7 +41,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
     let transactionsRepo = this.repoSrv.transactionsRepo;
 
     transactionsRepo
-      .sum('amount', {
+      .sum('amount' as never, {
         transactionType: 'debit',
         date: MoreThan(this.monthStart),
       })
@@ -50,7 +50,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
       });
 
     transactionsRepo
-      .sum('amount', {
+      .sum('amount' as never, {
         transactionType: 'credit',
         date: MoreThan(this.monthStart),
       })
