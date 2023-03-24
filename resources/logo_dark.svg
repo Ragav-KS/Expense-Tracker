@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="1024px" height="1024px" viewBox="0 0 1024 1024" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="objectBoundingBox" cx="65.7143%" cy="-6.4285717%" fx="65.7143%" fy="-6.4285717%" r="141.4214%" gradientTransform="translate(0.65714306,-0.06428572),rotate(44.999985),translate(-0.65714306,0.06428572)" id="gradient_1">
+      <stop offset="0%" stop-color="#74EDFF" />
+      <stop offset="100%" stop-color="#3000BF" />
+    </radialGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="1.6711166%" cy="-44.181767%" fx="1.6711166%" fy="-44.181767%" r="148.5863%" gradientTransform="translate(0.016711166,-0.44181767),scale(1,0.90992486),rotate(47.700413),translate(-0.016711166,0.44181767)" id="gradient_2">
+      <stop offset="0%" stop-color="#790000" />
+      <stop offset="100%" stop-color="#FF0000" />
+    </radialGradient>
+    <filter filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" id="filter_1">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+      <feMorphology radius="3" operator="dilate" in="SourceAlpha" result="effect0_dropShadow" />
+      <feOffset dx="-5" dy="9" />
+      <feGaussianBlur stdDeviation="11.5" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.39215687 0 0 0 0 0.39215687 0 0 0 0 0.39215687 0 0 0 0.49803922 0" />
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect0_dropShadow" />
+      <feBlend mode="normal" in="SourceGraphic" in2="effect0_dropShadow" result="shape" />
+    </filter>
+    <filter filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" id="filter_2">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+      <feMorphology radius="5" operator="dilate" in="SourceAlpha" result="effect0_dropShadow" />
+      <feOffset dx="-7" dy="12" />
+      <feGaussianBlur stdDeviation="7.5" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.8784314 0 0 0 0 0 0 0 0 0 0 0 0 0 0.45882353 0" />
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect0_dropShadow" />
+      <feBlend mode="normal" in="SourceGraphic" in2="effect0_dropShadow" result="shape" />
+    </filter>
+    <filter filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB" id="filter_3">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" />
+      <feMorphology radius="15" operator="dilate" in="SourceAlpha" result="effect0_dropShadow" />
+      <feOffset dx="-6" dy="10" />
+      <feGaussianBlur stdDeviation="21" />
+      <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.30980393 0" />
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect0_dropShadow" />
+      <feBlend mode="normal" in="SourceGraphic" in2="effect0_dropShadow" result="shape" />
+    </filter>
+    <path d="M0 0L1024 0L1024 1024L0 1024L0 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Icon 1024" clip-path="url(#clip_1)">
+    <path d="M0 0L1024 0L1024 1024L0 1024L0 0Z" id="Icon-1024" fill="#000000" fill-rule="evenodd" stroke="none" />
+    <path d="M162 512C162 318.7 318.7 162 512 162C705.3 162 862 318.7 862 512C862 705.3 705.3 862 512 862C318.7 862 162 705.3 162 512Z" id="Oval" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" filter="url(#filter_1)" />
+    <path d="M894.168 334.372C827 191.171 681.53 92.0001 512.897 92.0001C512.598 92.0001 512.299 92.0004 512 92.0011L512 512L894.168 334.372Z" id="pie-Intersect" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" filter="url(#filter_2)" />
+    <path d="M657.67 397.943L643.182 447.375L598.224 447.375C595.526 466.693 588.707 484.236 577.77 500.003C566.832 515.77 551.03 528.27 530.362 537.503C509.695 546.736 483.523 551.352 451.847 551.352L450.568 551.352L594.602 727.773L594.602 731.182L528.125 731.182L372.159 540.273L371.307 504.477L448.864 504.477C474.716 504.477 495.668 499.754 511.719 490.308C527.77 480.862 537.926 466.551 542.188 447.375L367.045 447.375L381.534 397.943L540.696 397.943C536.151 381.608 527.095 368.646 513.53 359.058C499.964 349.47 481.676 344.037 458.665 342.759L425.852 342.545L367.045 342.545L381.534 294.818L657.67 294.818L643.182 344.25L573.722 343.611C585.795 358.81 593.679 376.92 597.372 397.943L657.67 397.943Z" id="₹" fill="#FFFFFF" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="5" stroke-linecap="square" stroke-linejoin="round" filter="url(#filter_3)" />
+  </g>
+</svg>
