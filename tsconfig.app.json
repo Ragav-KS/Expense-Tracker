@@ -3,13 +3,24 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
+    "types": [
+      "gapi",
+      "gapi.auth2",
+      "gapi.client.gmail-v1",
+      "google.accounts"
+    ],
+    "paths": {
+      "react-native-sqlite-storage": [
+        "src/dummy.ts"
+      ]
+    }
   },
   "files": [
     "src/main.ts",
     "src/polyfills.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/dummy.ts",
   ]
 }
