@@ -3,7 +3,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
+import { CoreService } from 'src/app/services/Core/core.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { Between } from 'typeorm';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
@@ -19,6 +21,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private repoSrv: RepositoryService,
+    private coreSrv: CoreService,
     private modalCtrl: ModalController
   ) {}
 
@@ -39,10 +42,15 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   refresh() {
+    let dateRange = this.coreSrv.displayDateRange;
+
     this.repoSrv.transactionsRepo
       .find({
         order: {
           date: 'DESC',
+        },
+        where: {
+          date: Between(dateRange.start, dateRange.end),
         },
       })
       .then((transactions) => {

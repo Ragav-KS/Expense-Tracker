@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { CoreService } from 'src/app/services/Core/core.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
-import { MoreThan } from 'typeorm';
+import { Between } from 'typeorm';
 
 @Component({
   selector: 'app-summary',
@@ -9,10 +10,12 @@ import { MoreThan } from 'typeorm';
   styleUrls: ['./summary.component.scss'],
 })
 export class SummaryComponent implements OnInit, OnDestroy {
-  constructor(private repoSrv: RepositoryService) {}
+  constructor(
+    private repoSrv: RepositoryService,
+    private coreSrv: CoreService
+  ) {}
 
   dataRefreshedSubscription!: Subscription;
-  monthStart!: Date;
 
   expensesSum: number = 0;
   incomeSum: number = 0;
@@ -27,10 +30,6 @@ export class SummaryComponent implements OnInit, OnDestroy {
         this.refresh();
       }
     );
-
-    this.monthStart = new Date();
-    this.monthStart.setDate(1);
-    this.monthStart.setHours(0, 0, 0, 0);
   }
 
   ngOnDestroy(): void {
@@ -40,10 +39,12 @@ export class SummaryComponent implements OnInit, OnDestroy {
   refresh() {
     let transactionsRepo = this.repoSrv.transactionsRepo;
 
+    let dateRange = this.coreSrv.displayDateRange;
+
     transactionsRepo
       .sum('amount', {
         transactionType: 'debit',
-        date: MoreThan(this.monthStart),
+        date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
         this.expensesSum = sum ? sum : 0;
@@ -52,7 +53,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
     transactionsRepo
       .sum('amount', {
         transactionType: 'credit',
-        date: MoreThan(this.monthStart),
+        date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
         this.incomeSum = sum ? sum : 0;
