@@ -5,6 +5,8 @@ import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
+import { CoreService } from 'src/app/services/Core/core.service';
+import { MoreThan } from 'typeorm';
 
 @Component({
   selector: 'app-transactions',
@@ -19,6 +21,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private repoSrv: RepositoryService,
+    private coreSrv: CoreService,
     private modalCtrl: ModalController
   ) {}
 
@@ -39,10 +42,15 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   refresh() {
+    let dateRange = this.coreSrv.displayDateRange;
+
     this.repoSrv.transactionsRepo
       .find({
         order: {
           date: 'DESC',
+        },
+        where: {
+          date: MoreThan(dateRange.start),
         },
       })
       .then((transactions) => {
