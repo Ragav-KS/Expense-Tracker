@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CoreService } from 'src/app/services/Core/core.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
-import { MoreThan } from 'typeorm';
+import { Between } from 'typeorm';
 
 @Component({
   selector: 'app-summary',
@@ -44,7 +44,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
     transactionsRepo
       .sum('amount', {
         transactionType: 'debit',
-        date: MoreThan(dateRange.start),
+        date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
         this.expensesSum = sum ? sum : 0;
@@ -53,7 +53,7 @@ export class SummaryComponent implements OnInit, OnDestroy {
     transactionsRepo
       .sum('amount', {
         transactionType: 'credit',
-        date: MoreThan(dateRange.start),
+        date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
         this.incomeSum = sum ? sum : 0;

@@ -3,10 +3,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
-import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { CoreService } from 'src/app/services/Core/core.service';
-import { MoreThan } from 'typeorm';
+import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { Between } from 'typeorm';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
   selector: 'app-transactions',
@@ -50,7 +50,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
           date: 'DESC',
         },
         where: {
-          date: MoreThan(dateRange.start),
+          date: Between(dateRange.start, dateRange.end),
         },
       })
       .then((transactions) => {
