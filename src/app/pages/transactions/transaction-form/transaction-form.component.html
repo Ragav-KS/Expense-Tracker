@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Transaction Entry</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="onCancel()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+          <ion-item>
+            <ion-label position="floating">Party</ion-label>
+            <ion-input type="text" formControlName="party"></ion-input>
+            <ion-note
+              slot="end"
+              *ngIf="partyControl.errors?.['required'] && (partyControl.dirty || partyControl.touched)"
+              >Required</ion-note
+            >
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Amount</ion-label>
+            <ion-input type="number" formControlName="amount"></ion-input>
+            <ion-note
+              slot="end"
+              *ngIf="amountControl.errors?.['min']&& (amountControl.dirty || amountControl.touched)"
+              >Minimum 1</ion-note
+            >
+            <ion-note
+              slot="end"
+              *ngIf="amountControl.errors?.['required'] && (amountControl.dirty || amountControl.touched)"
+              >Required</ion-note
+            >
+          </ion-item>
+          <ion-item>
+            <ion-label>Date</ion-label>
+            <ion-datetime-button datetime="date"></ion-datetime-button>
+          </ion-item>
+          <ion-radio-group value="credit" formControlName="transactionType">
+            <ion-item>
+              <ion-label>Credit</ion-label>
+              <ion-radio value="credit"></ion-radio>
+            </ion-item>
+            <ion-item>
+              <ion-label>Debit</ion-label>
+              <ion-radio value="debit"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+          <ion-item>
+            <ion-label position="floating">Mode</ion-label>
+            <ion-textarea formControlName="mode"></ion-textarea>
+          </ion-item>
+          <ion-button expand="block" type="submit">Submit</ion-button>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-modal [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime id="date" presentation="date" [max]="today()"></ion-datetime>
+  </ng-template>
+</ion-modal>
