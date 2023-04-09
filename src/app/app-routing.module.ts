@@ -11,11 +11,16 @@ const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
-  },  {
+  },
+  {
     path: 'transactions',
     loadChildren: () => import('./pages/transactions/transactions.module').then( m => m.TransactionsPageModule)
   },
-
+  {
+    path: 'tabs',
+    loadChildren: () =>
+      import('./pages/tabs/tabs.module').then((m) => m.TabsPageModule),
+  },
 ];
 
 @NgModule({
