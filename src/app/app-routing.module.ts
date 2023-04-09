@@ -9,12 +9,15 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'tabs',
     pathMatch: 'full',
   },
   {
     path: 'transactions',
-    loadChildren: () => import('./pages/transactions/transactions.module').then( m => m.TransactionsPageModule)
+    loadChildren: () =>
+      import('./pages/transactions/transactions.module').then(
+        (m) => m.TransactionsPageModule
+      ),
   },
   {
     path: 'tabs',
