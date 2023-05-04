@@ -20,6 +20,11 @@ const routes: Routes = [
             (m) => m.TransactionsPageModule
           ),
       },
+      {
+        path: '',
+        redirectTo: '/tabs/home',
+        pathMatch: 'full',
+      },
     ],
   },
 ];
