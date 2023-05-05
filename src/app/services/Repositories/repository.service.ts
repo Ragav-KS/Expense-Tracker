@@ -1,5 +1,4 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
 import { IMail, MailEntity } from 'src/app/entities/mail';
 import { IParty, PartyEntity } from 'src/app/entities/party';
 import { ITransaction, TransactionEntity } from 'src/app/entities/transaction';
@@ -10,9 +9,6 @@ import { SqliteStorageService } from '../Storage/sqlite-storage.service';
   providedIn: 'root',
 })
 export class RepositoryService {
-  private repoLoaded = false;
-  private repoLoadedEmitter = new EventEmitter<void>();
-
   public dataRefreshed = new EventEmitter<void>();
 
   public mailsRepo!: Repository<IMail>;
@@ -21,17 +17,8 @@ export class RepositoryService {
 
   constructor(private sqliteSrv: SqliteStorageService) {
     this.loadRepo().then(() => {
-      this.repoLoaded = true;
-      this.repoLoadedEmitter.emit();
       this.dataRefreshed.emit();
     });
-  }
-
-  async waitForRepo() {
-    if (!this.repoLoaded) {
-      console.info('>>>> [sqlite] Waiting for Repository');
-      await firstValueFrom(this.repoLoadedEmitter);
-    }
   }
 
   async loadRepo() {
