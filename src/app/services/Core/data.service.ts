@@ -10,6 +10,8 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 })
 export class DataService {
   transactionsList = new BehaviorSubject([] as ITransaction[]);
+  expensesSum = new BehaviorSubject(0);
+  incomeSum = new BehaviorSubject(0);
 
   constructor(
     private repoSrv: RepositoryService,
@@ -35,6 +37,24 @@ export class DataService {
       .then((transactions) => {
         this.transactionsList.next(transactions);
         console.log('>>>> [Data] transactions loaded');
+      });
+
+    this.repoSrv.transactionsRepo
+      .sum('amount', {
+        transactionType: 'debit',
+        date: Between(dateRange.start, dateRange.end),
+      })
+      .then((sum) => {
+        this.expensesSum.next(sum ? sum : 0);
+      });
+
+    this.repoSrv.transactionsRepo
+      .sum('amount', {
+        transactionType: 'credit',
+        date: Between(dateRange.start, dateRange.end),
+      })
+      .then((sum) => {
+        this.incomeSum.next(sum ? sum : 0);
       });
   }
 }
