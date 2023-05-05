@@ -23,6 +23,7 @@ export class RepositoryService {
     this.loadRepo().then(() => {
       this.repoLoaded = true;
       this.repoLoadedEmitter.emit();
+      this.dataRefreshed.emit();
     });
   }
 

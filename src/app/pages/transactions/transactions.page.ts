@@ -3,9 +3,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
-import { CoreService } from 'src/app/services/Core/core.service';
+import { DataService } from 'src/app/services/Core/data.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
-import { Between } from 'typeorm';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
@@ -17,47 +16,25 @@ export class TransactionsPage implements OnInit, OnDestroy {
   transactionsList: ITransaction[] = [];
   transactionsGrouped: Map<number, ITransaction[]> = new Map();
 
-  private dataRefreshedSubscription!: Subscription;
+  private transactionsListSubscription!: Subscription;
 
   constructor(
     private repoSrv: RepositoryService,
-    private coreSrv: CoreService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private DataSrv: DataService
   ) {}
 
   ngOnInit() {
-    this.repoSrv.waitForRepo().then(() => {
-      this.refresh();
-    });
-
-    this.dataRefreshedSubscription = this.repoSrv.dataRefreshed.subscribe(
-      () => {
-        this.refresh();
+    this.transactionsListSubscription = this.DataSrv.transactionsList.subscribe(
+      (transactions) => {
+        this.transactionsList = transactions;
+        this.groupTransactions();
       }
     );
   }
 
   ngOnDestroy(): void {
-    this.dataRefreshedSubscription.unsubscribe();
-  }
-
-  refresh() {
-    let dateRange = this.coreSrv.displayDateRange;
-
-    this.repoSrv.transactionsRepo
-      .find({
-        order: {
-          date: 'DESC',
-        },
-        where: {
-          date: Between(dateRange.start, dateRange.end),
-        },
-      })
-      .then((transactions) => {
-        this.transactionsList = transactions;
-        console.log('>>>> [page] transactions loaded');
-        this.groupTransactions();
-      });
+    this.transactionsListSubscription.unsubscribe();
   }
 
   groupTransactions() {
