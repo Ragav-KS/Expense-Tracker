@@ -10,11 +10,7 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit, OnDestroy {
-  constructor(
-    private gmailSrv: GmailService,
-    private jobsSrv: JobsService,
-    private repoSrv: RepositoryService
-  ) {}
+  constructor(private gmailSrv: GmailService) {}
 
   loggedInSubscription!: Subscription;
   dataRefreshedSubscription!: Subscription;
@@ -40,25 +36,5 @@ export class HomePage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.loggedInSubscription.unsubscribe();
-  }
-
-  async fetchMails() {
-    return new Promise<void>((resolve, reject) => {
-      this.jobsSrv.loadMails().subscribe({
-        next: (transaction) => {
-          console.log(transaction);
-        },
-        complete: () => {
-          this.repoSrv.save();
-          resolve();
-        },
-      });
-    });
-  }
-
-  handleRefresh(event: Event) {
-    this.fetchMails().then(() => {
-      (event.target as HTMLIonRefresherElement).complete();
-    });
   }
 }
