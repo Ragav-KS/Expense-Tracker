@@ -15,22 +15,8 @@ export class TabsPage implements OnInit {
 
   ngOnInit() {}
 
-  async fetchMails() {
-    return new Promise<void>((resolve, reject) => {
-      this.jobsSrv.loadMails().subscribe({
-        next: (transaction) => {
-          console.log(transaction);
-        },
-        complete: () => {
-          this.repoSrv.save();
-          resolve();
-        },
-      });
-    });
-  }
-
   handleRefresh(event: Event) {
-    this.fetchMails().then(() => {
+    this.jobsSrv.fetchMails().finally(() => {
       (event.target as HTMLIonRefresherElement).complete();
     });
   }

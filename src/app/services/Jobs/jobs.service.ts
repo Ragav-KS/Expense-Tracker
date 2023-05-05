@@ -7,6 +7,7 @@ import {
   from,
   map,
   Observable,
+  of,
   throwError,
 } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
@@ -21,14 +22,14 @@ import { PreferenceStoreService } from '../Storage/preference-store.service';
   providedIn: 'root',
 })
 export class JobsService {
-  private bankConfig!: typeof banksConfig[0];
+  private bankConfig!: (typeof banksConfig)[0];
   private lastSync!: Date;
 
   constructor(
     private gmailSrv: GmailService,
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService,
-    private repoSrvc: RepositoryService,
+    private repoSrv: RepositoryService,
     private prefSrv: PreferenceStoreService
   ) {
     this.bankConfig = banksConfig.find((item) => item.name === 'HDFC')!;
@@ -45,10 +46,27 @@ export class JobsService {
     });
   }
 
-  loadMails(): Observable<IMail> {
-    let mailsRepo = this.repoSrvc.mailsRepo;
+  async fetchMails() {
+    return new Promise<void>((resolve, reject) => {
+      this.fetchMailsObservable().subscribe({
+        next: (transaction) => {
+          console.log(transaction);
+        },
+        complete: () => {
+          this.repoSrv.save();
+          this.prefSrv.set('lastSync', new Date().toISOString());
+          resolve();
+        },
+        error: (err) => {
+          reject(err);
+        },
+      });
+    });
+  }
 
-    let failed = false;
+  private fetchMailsObservable(): Observable<IMail> {
+    let mailsRepo = this.repoSrv.mailsRepo;
+
     return from(
       this.mailProcessorSrv.getMailList(
         this.gmailSrv.buildQuery({
@@ -57,69 +75,51 @@ export class JobsService {
           exclude: this.bankConfig.gmailFilter.exclude,
         })
       )
-    )
-      .pipe(
-        concatMap((list) => from(list)),
-        map((mail) => mail.id!),
-        concatMap((mailId) =>
-          from(
-            mailsRepo.findOneBy({
-              id: mailId,
-            })
-          ).pipe(
-            filter((trns) => {
-              return trns == null;
-            }),
-            map(() => mailId)
-          )
-        ),
-        concatMap(async (mailId) => {
-          return this.gmailSrv.getMail(mailId);
-        }),
-        map((mail) => {
-          let result = this.mailProcessorSrv.getPayload(mail);
+    ).pipe(
+      concatMap((list) => from(list)),
+      map((mail) => mail.id!),
+      concatMap((mailId) =>
+        from(
+          mailsRepo.findOneBy({
+            id: mailId,
+          })
+        ).pipe(
+          filter((trns) => {
+            return trns == null;
+          }),
+          map(() => mailId)
+        )
+      ),
+      concatMap(async (mailId) => {
+        return this.gmailSrv.getMail(mailId);
+      }),
+      map((mail) => {
+        let result = this.mailProcessorSrv.getPayload(mail);
 
-          let mailEntity: IMail = {
-            id: mail.id!,
-            meta_body: result.body,
-            date_meta: new Date(result.date),
-          };
+        let mailEntity: IMail = {
+          id: mail.id!,
+          meta_body: result.body,
+          date_meta: new Date(result.date),
+        };
 
-          return mailEntity;
-        }),
-        map((mail) => {
-          mail.meta_body = this.contentProcessorSrv.extractText(
-            mail.meta_body!
-          );
+        return mailEntity;
+      }),
+      map((mail) => {
+        mail.meta_body = this.contentProcessorSrv.extractText(mail.meta_body!);
 
-          return mail;
-        }),
-        map((mail) => {
-          mail.transaction = this.contentProcessorSrv.extractData(
-            mail.meta_body!,
-            mail.date_meta!
-          );
+        return mail;
+      }),
+      map((mail) => {
+        mail.transaction = this.contentProcessorSrv.extractData(
+          mail.meta_body!,
+          mail.date_meta!
+        );
 
-          return mail;
-        }),
-        concatMap((mail) => {
-          return mailsRepo.save(mail);
-        })
-      )
-      .pipe(
-        catchError((err, caught) => {
-          failed = true;
-          caught.subscribe((mail) => {
-            console.log(`>>>> [JobsService] failed at ID: ${mail.id}`);
-          });
-
-          return throwError(() => err);
-        }),
-        finalize(() => {
-          if (!failed) {
-            this.prefSrv.set('lastSync', new Date().toISOString());
-          }
-        })
-      );
+        return mail;
+      }),
+      concatMap((mail) => {
+        return mailsRepo.save(mail);
+      })
+    );
   }
 }
