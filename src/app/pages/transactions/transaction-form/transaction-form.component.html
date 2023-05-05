@@ -64,6 +64,11 @@
 
 <ion-modal [keepContentsMounted]="true">
   <ng-template>
-    <ion-datetime id="date" presentation="date" [max]="today()"></ion-datetime>
+    <ion-datetime
+      id="date"
+      presentation="date"
+      [max]="today()"
+      [formControl]="dateControl"
+    ></ion-datetime>
   </ng-template>
 </ion-modal>
