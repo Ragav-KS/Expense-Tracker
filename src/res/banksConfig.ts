@@ -25,6 +25,12 @@ export const banksConfig = [
           /Rs.(?<amount>[\d,]*\.\d{2}) has been debited from account (?<account>.*) to VPA (?<party>.*) on (?<date>.*).Your UPI transaction reference number is (?<ref>.*)./,
       },
       {
+        mode: 'UPI',
+        type: 'debit',
+        regex:
+          /Rs.(?<amount>[\d,]*\.\d{2}) has been debited from account (?<account>.*) to account (?<party>.*) on (?<date>.*).Your UPI transaction reference number is (?<ref>.*)./,
+      },
+      {
         mode: 'Debit Card',
         type: 'debit',
         regex:
