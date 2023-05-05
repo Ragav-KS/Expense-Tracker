@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
   selector: 'app-tabs',
@@ -8,16 +7,22 @@ import { RepositoryService } from 'src/app/services/Repositories/repository.serv
   styleUrls: ['./tabs.page.scss'],
 })
 export class TabsPage implements OnInit {
-  constructor(
-    private jobsSrv: JobsService,
-    private repoSrv: RepositoryService
-  ) {}
+  constructor(private jobsSrv: JobsService) {}
 
   ngOnInit() {}
 
   handleRefresh(event: Event) {
-    this.jobsSrv.fetchMails().finally(() => {
-      (event.target as HTMLIonRefresherElement).complete();
-    });
+    this.jobsSrv
+      .fetchMails()
+      .catch((err) => {
+        if (err.message === 'Unauthenticated') {
+          // Add logic to show alert/toast
+          return;
+        }
+        console.error(err);
+      })
+      .finally(() => {
+        (event.target as HTMLIonRefresherElement).complete();
+      });
   }
 }

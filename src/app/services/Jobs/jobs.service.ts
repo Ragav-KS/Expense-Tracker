@@ -1,15 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  catchError,
-  concatMap,
-  filter,
-  finalize,
-  from,
-  map,
-  Observable,
-  of,
-  throwError,
-} from 'rxjs';
+import { concatMap, filter, from, map, Observable } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
@@ -58,6 +48,10 @@ export class JobsService {
           resolve();
         },
         error: (err) => {
+          if (err.status == 'UNAUTHENTICATED') {
+            reject(Error('Unauthenticated'));
+          }
+
           reject(err);
         },
       });
