@@ -58,8 +58,14 @@ export class DataService {
       });
   }
 
-  deleteTransaction(transaction: ITransaction) {
+  async deleteTransaction(transaction: ITransaction) {
     this.repoSrv.transactionsRepo.remove(transaction).then(() => {
+      this.repoSrv.save();
+    });
+  }
+
+  async createTransaction(transaction: ITransaction) {
+    this.repoSrv.transactionsRepo.save(transaction).then(() => {
       this.repoSrv.save();
     });
   }
