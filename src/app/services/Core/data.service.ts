@@ -57,4 +57,10 @@ export class DataService {
         this.incomeSum.next(sum ? sum : 0);
       });
   }
+
+  deleteTransaction(transaction: ITransaction) {
+    this.repoSrv.transactionsRepo.remove(transaction).then(() => {
+      this.repoSrv.save();
+    });
+  }
 }

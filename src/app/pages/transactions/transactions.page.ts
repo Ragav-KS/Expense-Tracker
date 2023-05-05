@@ -4,7 +4,6 @@ import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
 import { DataService } from 'src/app/services/Core/data.service';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
@@ -19,7 +18,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
   private transactionsListSubscription!: Subscription;
 
   constructor(
-    private repoSrv: RepositoryService,
     private modalCtrl: ModalController,
     private DataSrv: DataService
   ) {}
@@ -88,9 +86,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transaction: ITransaction) {
-    this.repoSrv.transactionsRepo.remove(transaction).then(() => {
-      this.repoSrv.save();
-    });
+    this.DataSrv.deleteTransaction(transaction);
   }
 
   keyDescOrder = (
