@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { ITransaction } from 'src/app/entities/transaction';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { DataService } from 'src/app/services/Core/data.service';
 
 @Component({
   selector: 'app-transaction-entry',
@@ -39,7 +39,7 @@ export class TransactionFormComponent implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private repoSrv: RepositoryService
+    private DataSrv: DataService
   ) {}
 
   ngOnInit() {
@@ -87,9 +87,10 @@ export class TransactionFormComponent implements OnInit {
     this.transaction.mode = this.modeControl.value!;
     this.transaction.transactionType = this.transactionTypeControl.value!;
 
-    await this.repoSrv.transactionsRepo.save(this.transaction);
-
-    await this.repoSrv.save();
+    await this.DataSrv.createTransaction(this.transaction).catch((err) => {
+      // TODO: show error message in a modal/toast
+      console.log(err);
+    });
 
     this.modalCtrl.dismiss(this.transaction);
   }

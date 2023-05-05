@@ -146,7 +146,7 @@ export class GmailService {
         response = res;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch message list.' + err);
+        throw err.result.error;
       });
 
     return response.result;
@@ -168,7 +168,7 @@ export class GmailService {
         response = res;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch message.' + err);
+        throw err.result.error;
       });
 
     return response.result;
