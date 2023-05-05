@@ -3,7 +3,6 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { ITransaction } from 'src/app/entities/transaction';
 import { DataService } from 'src/app/services/Core/data.service';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 
 @Component({
   selector: 'app-transaction-entry',
