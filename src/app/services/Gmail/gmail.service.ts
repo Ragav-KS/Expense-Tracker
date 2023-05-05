@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import moment from 'moment';
+import format from 'date-fns/format';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import credentials from 'src/res/credentials.json';
@@ -114,7 +114,7 @@ export class GmailService {
     }
 
     if (after) {
-      const dateString = moment(after).format('YYYY-MM-DD');
+      const dateString = format(after, 'yyyy-MM-dd');
       query += `after:${dateString} `;
     }
 
