@@ -88,7 +88,10 @@ export class TransactionFormComponent implements OnInit {
     this.transaction.mode = this.modeControl.value!;
     this.transaction.transactionType = this.transactionTypeControl.value!;
 
-    await this.DataSrv.createTransaction(this.transaction);
+    await this.DataSrv.createTransaction(this.transaction).catch((err) => {
+      // TODO: show error message in a modal/toast
+      console.log(err);
+    });
 
     this.modalCtrl.dismiss(this.transaction);
   }

@@ -86,7 +86,10 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transaction: ITransaction) {
-    this.DataSrv.deleteTransaction(transaction);
+    this.DataSrv.deleteTransaction(transaction).catch((err) => {
+      // TODO: show error message in a modal/toast
+      console.error(err);
+    });
   }
 
   keyDescOrder = (
