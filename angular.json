@@ -39,8 +39,7 @@
             "allowedCommonJsDependencies": [
               "debug",
               "buffer",
-              "sha.js",
-              "moment"
+              "sha.js"
             ]
           },
           "configurations": {

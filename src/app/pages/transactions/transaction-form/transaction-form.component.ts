@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { ITransaction } from 'src/app/entities/transaction';
-import { RepositoryService } from 'src/app/services/Repositories/repository.service';
+import { DataService } from 'src/app/services/Core/data.service';
 
 @Component({
   selector: 'app-transaction-entry',
@@ -25,21 +25,21 @@ export class TransactionFormComponent implements OnInit {
 
   partyControl!: FormControl<string | null>;
   amountControl!: FormControl<number | null>;
-  dateControl!: FormControl<Date | null>;
+  dateControl!: FormControl<string | null>;
   modeControl!: FormControl<string | null>;
   transactionTypeControl!: FormControl<string | null>;
 
   transactionForm!: FormGroup<{
     party: FormControl<string | null>;
     amount: FormControl<number | null>;
-    date: FormControl<Date | null>;
+    date: FormControl<string | null>;
     mode: FormControl<string | null>;
     transactionType: FormControl<string | null>;
   }>;
 
   constructor(
     private modalCtrl: ModalController,
-    private repoSrv: RepositoryService
+    private DataSrv: DataService
   ) {}
 
   ngOnInit() {
@@ -51,7 +51,7 @@ export class TransactionFormComponent implements OnInit {
       Validators.min(1),
       Validators.required,
     ]);
-    this.dateControl = new FormControl(this.transaction.date);
+    this.dateControl = new FormControl(this.transaction.date.toISOString());
     this.modeControl = new FormControl(this.transaction.mode!);
     this.transactionTypeControl = new FormControl(
       this.transaction.transactionType
@@ -83,13 +83,14 @@ export class TransactionFormComponent implements OnInit {
     }
 
     this.transaction.amount = this.amountControl.value!;
-    this.transaction.date = this.dateControl.value!;
+    this.transaction.date = new Date(this.dateControl.value!);
     this.transaction.mode = this.modeControl.value!;
     this.transaction.transactionType = this.transactionTypeControl.value!;
 
-    await this.repoSrv.transactionsRepo.save(this.transaction);
-
-    await this.repoSrv.save();
+    await this.DataSrv.createTransaction(this.transaction).catch((err) => {
+      // TODO: show error message in a modal/toast
+      console.log(err);
+    });
 
     this.modalCtrl.dismiss(this.transaction);
   }

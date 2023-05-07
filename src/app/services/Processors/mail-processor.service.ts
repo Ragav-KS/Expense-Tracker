@@ -18,9 +18,11 @@ export class MailProcessorService {
           query: query,
         })
         .then((result) => {
-          mailList.push(...result.messages!);
-
           nextPageToken = result.nextPageToken;
+
+          if (result.messages) {
+            mailList.push(...result.messages);
+          }
         });
     }
 
