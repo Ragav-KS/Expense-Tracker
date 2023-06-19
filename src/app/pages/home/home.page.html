@@ -5,13 +5,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-refresher
-    slot="fixed"
-    [pullFactor]="0.5"
-    [pullMin]="100"
-    [pullMax]="200"
-    (ionRefresh)="handleRefresh($event)"
-  >
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content> </ion-refresher-content>
   </ion-refresher>
 
