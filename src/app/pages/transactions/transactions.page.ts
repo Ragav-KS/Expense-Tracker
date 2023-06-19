@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
 import { DataService } from 'src/app/services/Core/data.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
+import { JobsService } from 'src/app/services/Jobs/jobs.service';
 
 @Component({
   selector: 'app-transactions',
@@ -19,7 +20,8 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private modalCtrl: ModalController,
-    private DataSrv: DataService
+    private DataSrv: DataService,
+    private jobsSrv: JobsService
   ) {}
 
   ngOnInit() {
@@ -33,6 +35,21 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.transactionsListSubscription.unsubscribe();
+  }
+
+  handleRefresh(event: Event) {
+    this.jobsSrv
+      .fetchMails()
+      .catch((err) => {
+        if (err.message === 'Unauthenticated') {
+          // Add logic to show alert/toast
+          return;
+        }
+        console.error(err);
+      })
+      .finally(() => {
+        (event.target as HTMLIonRefresherElement).complete();
+      });
   }
 
   groupTransactions() {

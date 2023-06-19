@@ -1,32 +1,18 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Expense Tracker</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-tabs>
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Expense Tracker</ion-title>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-  <ion-refresher
-    slot="fixed"
-    [pullFactor]="0.5"
-    [pullMin]="100"
-    [pullMax]="200"
-    (ionRefresh)="handleRefresh($event)"
-  >
-    <ion-refresher-content> </ion-refresher-content>
-  </ion-refresher>
-
-  <ion-router-outlet></ion-router-outlet>
-
-  <ion-tabs>
-    <ion-tab-bar slot="bottom">
-      <ion-tab-button tab="home">
-        <ion-icon name="home"></ion-icon>
-        Home
-      </ion-tab-button>
-      <ion-tab-button tab="transactions">
-        <ion-icon name="card"></ion-icon>
-        Transactions
-      </ion-tab-button>
-    </ion-tab-bar>
-  </ion-tabs>
-</ion-content>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="home">
+      <ion-icon name="home"></ion-icon>
+      Home
+    </ion-tab-button>
+    <ion-tab-button tab="transactions">
+      <ion-icon name="card"></ion-icon>
+      Transactions
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
