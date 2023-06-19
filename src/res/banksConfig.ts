@@ -49,6 +49,12 @@ export const banksConfig = [
           /Dear Card Member,  Thank you for using your HDFC Bank Credit Card ending (?<account>.*) for Rs (?<amount>[\d,]*\.\d{2}) at (?<party>.*) on (?<date>.*) (?<time>.*)\.  After the above transaction, the available balance on your card is Rs (?<balance>[\d,]*\.\d{2}) and the total outstanding is Rs (?<outstanding>[\d,]*\.\d{2})/,
       },
       {
+        mode: 'Credit Card',
+        type: 'debit',
+        regex:
+          /Dear Card Member,  Thank you for using your HDFC Bank Credit Card ending (?<account>.*) for Rs (?<amount>[\d,]*\.\d{2}) at (?<party>.*) on (?<date>.*) (?<time>.*)\. Authorization code:- (?<auth>.*)  After the above transaction, the available balance on your card is Rs (?<balance>[\d,]*\.\d{2}) and the total outstanding is Rs (?<outstanding>[\d,]*\.\d{2})./,
+      },
+      {
         mode: 'NetBanking',
         type: 'debit',
         regex:
