@@ -1,9 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { DataService } from 'src/app/services/Core/data.service';
 import { AppState } from 'src/app/store/app.index';
-import { transactionStore } from 'src/app/store/transaction/transaction.reducer';
 import {
   selectExpensesSum,
   selectIncomeSum,
@@ -15,7 +13,7 @@ import {
   styleUrls: ['./summary.component.scss'],
 })
 export class SummaryComponent implements OnInit, OnDestroy {
-  constructor(private DataSrv: DataService, private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>) {}
 
   expenseSumSubscription!: Subscription;
   incomeSumSubscription!: Subscription;
