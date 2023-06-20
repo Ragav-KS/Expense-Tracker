@@ -5,6 +5,7 @@ export interface settingStore {
     start: Date;
     end: Date;
   };
+  bank: string;
 }
 
 const monthStart = () => {
@@ -20,6 +21,7 @@ export const initialState: settingStore = {
     start: monthStart(),
     end: new Date(),
   },
+  bank: 'HDFC',
 };
 
 export const settingReducer = createReducer(initialState);

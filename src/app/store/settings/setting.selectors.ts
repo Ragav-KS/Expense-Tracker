@@ -7,3 +7,8 @@ export const selectDateRange = createSelector(
   selectSettingsFeature,
   (transactionStore) => transactionStore.dateRange
 );
+
+export const selectBank = createSelector(
+  selectSettingsFeature,
+  (transactionStore) => transactionStore.bank
+);
