@@ -24,13 +24,17 @@ export class SummaryComponent implements OnInit, OnDestroy {
   incomeSum: number = 0;
 
   ngOnInit() {
-    this.store.select(selectExpensesSum).subscribe((expensesSum) => {
-      this.expensesSum = expensesSum;
-    });
+    this.expenseSumSubscription = this.store
+      .select(selectExpensesSum)
+      .subscribe((expensesSum) => {
+        this.expensesSum = expensesSum;
+      });
 
-    this.store.select(selectIncomeSum).subscribe((incomeSum) => {
-      this.incomeSum = incomeSum;
-    });
+    this.incomeSumSubscription = this.store
+      .select(selectIncomeSum)
+      .subscribe((incomeSum) => {
+        this.incomeSum = incomeSum;
+      });
   }
 
   ngOnDestroy(): void {

@@ -6,6 +6,9 @@ import { ITransaction } from 'src/app/entities/transaction';
 import { DataService } from 'src/app/services/Core/data.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
+import { AppState } from 'src/app/store/app.index';
+import { Store } from '@ngrx/store';
+import { selectTransactionsList } from 'src/app/store/transaction/transaction.selectors';
 
 @Component({
   selector: 'app-transactions',
@@ -21,16 +24,17 @@ export class TransactionsPage implements OnInit, OnDestroy {
   constructor(
     private modalCtrl: ModalController,
     private DataSrv: DataService,
-    private jobsSrv: JobsService
+    private jobsSrv: JobsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.transactionsListSubscription = this.DataSrv.transactionsList.subscribe(
-      (transactions) => {
+    this.transactionsListSubscription = this.store
+      .select(selectTransactionsList)
+      .subscribe((transactions) => {
         this.transactionsList = transactions;
         this.groupTransactions();
-      }
-    );
+      });
   }
 
   ngOnDestroy(): void {
