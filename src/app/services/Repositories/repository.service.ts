@@ -40,6 +40,5 @@ export class RepositoryService {
 
   async save() {
     await this.sqliteSrv.saveDB();
-    this.store.dispatch(refresh());
   }
 }

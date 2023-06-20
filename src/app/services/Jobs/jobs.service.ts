@@ -7,6 +7,9 @@ import { ContentProcessorService } from '../Processors/content-processor.service
 import { MailProcessorService } from '../Processors/mail-processor.service';
 import { RepositoryService } from '../Repositories/repository.service';
 import { PreferenceStoreService } from '../Storage/preference-store.service';
+import { AppState } from 'src/app/store/app.index';
+import { Store } from '@ngrx/store';
+import { refresh } from 'src/app/store/transaction/transaction.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +23,8 @@ export class JobsService {
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService,
     private repoSrv: RepositoryService,
-    private prefSrv: PreferenceStoreService
+    private prefSrv: PreferenceStoreService,
+    private store: Store<AppState>
   ) {
     this.bankConfig = banksConfig.find((item) => item.name === 'HDFC')!;
 
@@ -42,9 +46,10 @@ export class JobsService {
         next: (transaction) => {
           console.log(transaction);
         },
-        complete: () => {
-          this.repoSrv.save();
-          this.prefSrv.set('lastSync', new Date().toISOString());
+        complete: async () => {
+          await this.repoSrv.save();
+          this.store.dispatch(refresh());
+          await this.prefSrv.set('lastSync', new Date().toISOString());
           resolve();
         },
         error: (err) => {
