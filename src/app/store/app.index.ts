@@ -1,3 +1,4 @@
+import { settingReducer, settingStore } from './settings/setting.reducer';
 import {
   transactionReducer,
   transactionStore,
@@ -5,10 +6,12 @@ import {
 
 const reducers = {
   transaction: transactionReducer,
+  setting: settingReducer,
 };
 
 interface AppState {
   transaction: transactionStore;
+  setting: settingStore;
 }
 
 export { reducers, AppState };
