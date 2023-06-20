@@ -12,6 +12,7 @@ import { transactionReducer } from './store/transaction/transaction.reducer';
 import { reducers } from './store/app.index';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EffectsModule } from '@ngrx/effects';
+import { TransactionEffects } from './store/transaction/transaction.effects';
 
 @NgModule({
   declarations: [AppComponent],
@@ -20,8 +21,12 @@ import { EffectsModule } from '@ngrx/effects';
     IonicModule.forRoot(),
     AppRoutingModule,
     StoreModule.forRoot(reducers),
-    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() }),
-    EffectsModule.forRoot([]),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      trace: true,
+    }),
+    EffectsModule.forRoot([TransactionEffects]),
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
