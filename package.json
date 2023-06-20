@@ -29,6 +29,7 @@
     "@capacitor/preferences": "^5.0.0",
     "@capacitor/status-bar": "^5.0.0",
     "@ionic/angular": "^7.0.5",
+    "@ngrx/effects": "^16.0.1",
     "@ngrx/store": "^16.0.1",
     "@ngrx/store-devtools": "^16.0.1",
     "@types/gapi": "^0.0.44",
