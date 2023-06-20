@@ -4,6 +4,9 @@ import { ITransaction } from 'src/app/entities/transaction';
 import { Between } from 'typeorm';
 import { RepositoryService } from '../Repositories/repository.service';
 import { CoreService } from './core.service';
+import { Store } from '@ngrx/store';
+import { load } from 'src/app/store/transaction/transaction.actions';
+import { transactionStore } from 'src/app/store/transaction/transaction.reducer';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +18,8 @@ export class DataService {
 
   constructor(
     private repoSrv: RepositoryService,
-    private coreSrv: CoreService
+    private coreSrv: CoreService,
+    private store: Store<transactionStore>
   ) {
     this.repoSrv.dataRefreshed.subscribe(() => {
       this.refresh();
@@ -36,6 +40,7 @@ export class DataService {
       })
       .then((transactions) => {
         this.transactionsList.next(transactions);
+        this.store.dispatch(load({ list: transactions }));
         console.log('>>>> [Data] transactions loaded');
       });
 
@@ -45,6 +50,7 @@ export class DataService {
         date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
+        this.store.dispatch(load({ expensesSum: sum ? sum : 0 }));
         this.expensesSum.next(sum ? sum : 0);
       });
 
@@ -54,6 +60,7 @@ export class DataService {
         date: Between(dateRange.start, dateRange.end),
       })
       .then((sum) => {
+        this.store.dispatch(load({ incomeSum: sum ? sum : 0 }));
         this.incomeSum.next(sum ? sum : 0);
       });
   }
