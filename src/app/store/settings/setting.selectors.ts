@@ -5,10 +5,15 @@ const selectSettingsFeature = createFeatureSelector<settingStore>('setting');
 
 export const selectDateRange = createSelector(
   selectSettingsFeature,
-  (transactionStore) => transactionStore.dateRange
+  (settingStore) => settingStore.dateRange
 );
 
 export const selectBank = createSelector(
   selectSettingsFeature,
-  (transactionStore) => transactionStore.bank
+  (settingStore) => settingStore.bank
+);
+
+export const selectLastSyncDate = createSelector(
+  selectSettingsFeature,
+  (settingStore) => settingStore.lastSync
 );

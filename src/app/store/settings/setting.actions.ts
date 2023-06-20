@@ -10,3 +10,8 @@ export const setDateRange = createAction(
     };
   }>
 );
+
+export const setLastSyncDate = createAction(
+  '[Setting] Set Last Sync Date',
+  props<{ date: Date }>()
+);

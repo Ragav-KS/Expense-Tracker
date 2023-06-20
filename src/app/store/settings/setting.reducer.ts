@@ -1,27 +1,26 @@
-import { createReducer } from '@ngrx/store';
+import { createReducer, on } from '@ngrx/store';
+import { setLastSyncDate } from './setting.actions';
+import { monthStart } from './setting.util';
 
 export interface settingStore {
   dateRange: {
     start: Date;
     end: Date;
   };
+  lastSync: Date;
   bank: string;
 }
-
-const monthStart = () => {
-  let monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
-
-  return monthStart;
-};
 
 export const initialState: settingStore = {
   dateRange: {
     start: monthStart(),
     end: new Date(),
   },
+  lastSync: monthStart(),
   bank: 'HDFC',
 };
 
-export const settingReducer = createReducer(initialState);
+export const settingReducer = createReducer(
+  initialState,
+  on(setLastSyncDate, (state, { date }) => ({ ...state, lastSync: date }))
+);
