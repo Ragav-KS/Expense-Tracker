@@ -19,7 +19,7 @@ export class DataService {
     private store: Store<AppState>
   ) {
     this.repoSrv.dataRefreshed.subscribe(() => {
-      this.refresh();
+      // this.refresh();
     });
   }
 

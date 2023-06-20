@@ -3,12 +3,12 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
-import { DataService } from 'src/app/services/Core/data.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { AppState } from 'src/app/store/app.index';
 import { Store } from '@ngrx/store';
 import { selectTransactionsList } from 'src/app/store/transaction/transaction.selectors';
+import { removeTransaction } from 'src/app/store/transaction/transaction.actions';
 
 @Component({
   selector: 'app-transactions',
@@ -23,7 +23,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private modalCtrl: ModalController,
-    private DataSrv: DataService,
     private jobsSrv: JobsService,
     private store: Store<AppState>
   ) {}
@@ -107,10 +106,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transaction: ITransaction) {
-    this.DataSrv.deleteTransaction(transaction).catch((err) => {
-      // TODO: show error message in a modal/toast
-      console.error(err);
-    });
+    this.store.dispatch(removeTransaction({ transaction }));
   }
 
   keyDescOrder = (

@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { map, switchMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import { CoreService } from 'src/app/services/Core/core.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { Between } from 'typeorm';
-import { load, refresh } from './transaction.actions';
+import {
+  addTransaction,
+  load,
+  refresh,
+  removeTransaction,
+} from './transaction.actions';
 
 @Injectable()
 export class TransactionEffects {
@@ -43,6 +48,28 @@ export class TransactionEffects {
         };
       }),
       map((payload) => load(payload))
+    )
+  );
+
+  addTransaction$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(addTransaction),
+      mergeMap(async ({ transaction }) => {
+        await this.repoSrv.transactionsRepo.save({ ...transaction });
+        await this.repoSrv.save();
+      }),
+      map(() => refresh())
+    )
+  );
+
+  removeTransaction$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(removeTransaction),
+      mergeMap(async ({ transaction }) => {
+        await this.repoSrv.transactionsRepo.remove({ ...transaction });
+        await this.repoSrv.save();
+      }),
+      map(() => refresh())
     )
   );
 }
