@@ -10,6 +10,7 @@ import {
   refresh,
   removeTransaction,
 } from './transaction.actions';
+import { cloneDeep } from 'lodash-es';
 
 @Injectable()
 export class TransactionEffects {
@@ -55,7 +56,7 @@ export class TransactionEffects {
     this.actions$.pipe(
       ofType(addTransaction),
       mergeMap(async ({ transaction }) => {
-        await this.repoSrv.transactionsRepo.save({ ...transaction });
+        await this.repoSrv.transactionsRepo.save(cloneDeep(transaction));
         await this.repoSrv.save();
       }),
       map(() => refresh())
