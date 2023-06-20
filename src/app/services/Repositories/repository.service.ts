@@ -12,8 +12,6 @@ import { refresh } from 'src/app/store/transaction/transaction.actions';
   providedIn: 'root',
 })
 export class RepositoryService {
-  public dataRefreshed = new EventEmitter<void>();
-
   public mailsRepo!: Repository<IMail>;
   public transactionsRepo!: Repository<ITransaction>;
   public partiesRepo!: Repository<IParty>;
@@ -23,10 +21,6 @@ export class RepositoryService {
     private store: Store<AppState>
   ) {
     this.loadRepo().then(() => {
-      this.dataRefreshed.emit();
-    });
-
-    this.dataRefreshed.subscribe(() => {
       this.store.dispatch(refresh());
     });
   }
@@ -46,6 +40,6 @@ export class RepositoryService {
 
   async save() {
     await this.sqliteSrv.saveDB();
-    this.dataRefreshed.emit();
+    this.store.dispatch(refresh());
   }
 }
