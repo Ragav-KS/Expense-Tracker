@@ -14,22 +14,32 @@ export class TransactionEffects {
     private coreSrv: CoreService
   ) {}
 
-  loadMovies$ = createEffect(() =>
+  refreshTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(refresh),
       switchMap(async () => {
+        const dateRange = this.coreSrv.displayDateRange;
         return {
           list: await this.repoSrv.transactionsRepo.find({
             order: {
               date: 'DESC',
             },
             where: {
-              date: Between(
-                this.coreSrv.displayDateRange.start,
-                this.coreSrv.displayDateRange.end
-              ),
+              date: Between(dateRange.start, dateRange.end),
             },
           }),
+          expensesSum: await this.repoSrv.transactionsRepo
+            .sum('amount', {
+              transactionType: 'debit',
+              date: Between(dateRange.start, dateRange.end),
+            })
+            .then((sum) => (sum ? sum : 0)),
+          incomeSum: await this.repoSrv.transactionsRepo
+            .sum('amount', {
+              transactionType: 'credit',
+              date: Between(dateRange.start, dateRange.end),
+            })
+            .then((sum) => (sum ? sum : 0)),
         };
       }),
       map((payload) => load(payload))

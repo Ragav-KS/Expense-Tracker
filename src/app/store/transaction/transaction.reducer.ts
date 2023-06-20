@@ -22,14 +22,5 @@ export const transactionReducer = createReducer(
       expensesSum: action.expensesSum ? action.expensesSum : state.expensesSum,
       incomeSum: action.incomeSum ? action.incomeSum : state.incomeSum,
     };
-  }),
-  on(addTransaction, (state, { transaction }) => {
-    return { ...state, list: [...state.list, transaction] };
-  }),
-  on(removeTransaction, (state, { transaction }) => {
-    return {
-      ...state,
-      list: state.list.filter((t) => t.id !== transaction.id),
-    };
   })
 );
