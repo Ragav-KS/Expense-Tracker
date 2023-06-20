@@ -1,30 +1,32 @@
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { cloneDeep } from 'lodash-es';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { CoreService } from 'src/app/services/Core/core.service';
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { Between } from 'typeorm';
+import { AppState } from '../app.index';
+import { selectDateRange } from '../settings/setting.selectors';
 import {
   addTransaction,
   load,
   refresh,
   removeTransaction,
 } from './transaction.actions';
-import { cloneDeep } from 'lodash-es';
 
 @Injectable()
 export class TransactionEffects {
   constructor(
     private actions$: Actions,
     private repoSrv: RepositoryService,
-    private coreSrv: CoreService
+    private store: Store<AppState>
   ) {}
 
   refreshTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(refresh),
-      switchMap(async () => {
-        const dateRange = this.coreSrv.displayDateRange;
+      concatLatestFrom(() => [this.store.select(selectDateRange)]),
+      switchMap(async ([_, dateRange]) => {
         return {
           list: await this.repoSrv.transactionsRepo.find({
             order: {
