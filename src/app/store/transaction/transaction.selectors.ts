@@ -3,17 +3,20 @@ import { ITransaction } from 'src/app/entities/transaction';
 import { transactionStore } from './transaction.reducer';
 import { AppState } from '../app.index';
 
+const selectTransactionFeature =
+  createFeatureSelector<transactionStore>('transaction');
+
 export const selectTransactionsList = createSelector(
-  (state: AppState) => state.transaction,
+  selectTransactionFeature,
   (transactionStore) => transactionStore.list
 );
 
 export const selectExpensesSum = createSelector(
-  (state: AppState) => state.transaction,
+  selectTransactionFeature,
   (transactionStore) => transactionStore.expensesSum
 );
 
 export const selectIncomeSum = createSelector(
-  (state: AppState) => state.transaction,
+  selectTransactionFeature,
   (transactionStore) => transactionStore.incomeSum
 );
