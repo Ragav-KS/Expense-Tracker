@@ -7,7 +7,10 @@ import { TransactionFormComponent } from './transaction-form/transaction-form.co
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { AppState } from 'src/app/store/app.index';
 import { Store } from '@ngrx/store';
-import { selectTransactionsList } from 'src/app/store/transaction/transaction.selectors';
+import {
+  selectGroupedTransactionsList,
+  selectTransactionsList,
+} from 'src/app/store/transaction/transaction.selectors';
 import { removeTransaction } from 'src/app/store/transaction/transaction.actions';
 
 @Component({
@@ -29,10 +32,9 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.transactionsListSubscription = this.store
-      .select(selectTransactionsList)
+      .select(selectGroupedTransactionsList)
       .subscribe((transactions) => {
-        this.transactionsList = transactions;
-        this.groupTransactions();
+        this.transactionsGrouped = transactions;
       });
   }
 
@@ -53,27 +55,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
       .finally(() => {
         (event.target as HTMLIonRefresherElement).complete();
       });
-  }
-
-  groupTransactions() {
-    let transactionsGrouped = new Map();
-
-    this.transactionsList.forEach((transaction) => {
-      const date = transaction.date;
-      const dateKey = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      ).getTime();
-      const transactions = transactionsGrouped.get(dateKey);
-      if (transactions) {
-        transactions.push(transaction);
-      } else {
-        transactionsGrouped.set(dateKey, [transaction]);
-      }
-    });
-
-    this.transactionsGrouped = transactionsGrouped;
   }
 
   editTransaction(transaction: ITransaction) {
