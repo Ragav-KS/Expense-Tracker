@@ -1,7 +1,6 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { ITransaction } from 'src/app/entities/transaction';
 import { transactionStore } from './transaction.reducer';
-import { AppState } from '../app.index';
+import { groupTransactions } from './transaction.util';
 
 const selectTransactionFeature =
   createFeatureSelector<transactionStore>('transaction');
@@ -17,29 +16,6 @@ export const selectGroupedTransactionsList = createSelector(
     return groupTransactions(transactionStore.list);
   }
 );
-
-function groupTransactions(
-  transactionsList: ITransaction[]
-): Map<number, ITransaction[]> {
-  let transactionsGrouped = new Map();
-
-  transactionsList.forEach((transaction) => {
-    const date = transaction.date;
-    const dateKey = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    ).getTime();
-    const transactions = transactionsGrouped.get(dateKey);
-    if (transactions) {
-      transactions.push(transaction);
-    } else {
-      transactionsGrouped.set(dateKey, [transaction]);
-    }
-  });
-
-  return transactionsGrouped;
-}
 
 export const selectExpensesSum = createSelector(
   selectTransactionFeature,
