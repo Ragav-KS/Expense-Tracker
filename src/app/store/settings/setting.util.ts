@@ -1,7 +1,6 @@
-export const monthStart = () => {
-  let monthStart = new Date();
-  monthStart.setDate(1);
-  monthStart.setHours(0, 0, 0, 0);
+export const monthStart = (date = new Date()) => {
+  date.setDate(1);
+  date.setHours(0, 0, 0, 0);
 
-  return monthStart;
+  return date;
 };

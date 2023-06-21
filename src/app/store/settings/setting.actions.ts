@@ -8,7 +8,7 @@ export const setDateRange = createAction(
       start: Date;
       end: Date;
     };
-  }>
+  }>()
 );
 
 export const setLastSyncDate = createAction(

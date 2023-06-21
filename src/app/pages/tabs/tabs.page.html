@@ -1,7 +1,12 @@
 <ion-tabs>
   <ion-header>
     <ion-toolbar>
-      <ion-title>Expense Tracker</ion-title>
+      <ion-title> {{ dateRangeMode }} </ion-title>
+      <ion-buttons slot="primary">
+        <ion-button (click)="handleChooseRange()">
+          <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
