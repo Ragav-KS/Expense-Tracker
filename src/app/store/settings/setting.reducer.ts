@@ -41,10 +41,12 @@ export const settingReducer = createReducer(
           },
         });
       case 'custom':
-        if (dateRange) {
-          state.dateRange = dateRange;
-        }
-        return state;
+        return Object.assign({}, state, {
+          dateRange: {
+            start: dateRange!.start,
+            end: dateRange!.end,
+          },
+        });
     }
   }),
   on(setLastSyncDate, (state, { date }) => ({ ...state, lastSync: date }))
