@@ -1,7 +1,19 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
 
+  signingConfigs {
+    release {
+      storeFile file(keystoreProperties['storeFile'])
+      keyPassword keystoreProperties['keyPassword']
+      storePassword keystoreProperties['storePassword']
+      keyAlias keystoreProperties['keyAlias']
+    }
+  }
   namespace 'com.ragav.expensetracker'
   compileSdkVersion rootProject.ext.compileSdkVersion
   defaultConfig {
@@ -24,6 +36,10 @@ android {
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
+    }
+    debug {
+      signingConfig signingConfigs.release
     }
   }
 }
@@ -31,6 +47,13 @@ android {
 repositories {
   flatDir {
     dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+  }
+}
+
+configurations {
+  all {
+    exclude module: 'commons-logging'
+    exclude module: 'httpclient'
   }
 }
 
@@ -45,7 +68,6 @@ dependencies {
   androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
   implementation project(':capacitor-cordova-android-plugins')
 
-  implementation 'com.google.api-client:google-api-client:2.2.0'
   implementation 'com.google.api-client:google-api-client-android:2.2.0'
   implementation 'com.google.apis:google-api-services-gmail:v1-rev20230123-2.0.0'
 

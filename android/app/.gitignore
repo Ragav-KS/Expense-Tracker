@@ -1,3 +1,4 @@
 /build/*
+/release/*
 !/build/.npmkeep
 src/main/AndroidManifest.xml.orig
