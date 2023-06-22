@@ -1,14 +1,14 @@
 import { createReducer, on } from '@ngrx/store';
-import { addTransaction, removeTransaction, load } from './transaction.actions';
 import { ITransaction } from 'src/app/entities/transaction';
+import { load } from './transaction.actions';
 
-export interface transactionStore {
+export interface TransactionStore {
   list: ITransaction[];
   expensesSum: number;
   incomeSum: number;
 }
 
-export const initialState: transactionStore = {
+export const initialState: TransactionStore = {
   list: [],
   expensesSum: 0,
   incomeSum: 0,

@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 import { setDateRange, setLastSyncDate } from './setting.actions';
 import { monthStart } from './setting.util';
 
-export interface settingStore {
+export interface SettingStore {
   dateRange: {
     start: Date;
     end: Date;
@@ -11,7 +11,7 @@ export interface settingStore {
   bank: string;
 }
 
-export const initialState: settingStore = {
+export const initialState: SettingStore = {
   dateRange: {
     start: monthStart(),
     end: new Date(),
