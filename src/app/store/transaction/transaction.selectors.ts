@@ -1,9 +1,9 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { transactionStore } from './transaction.reducer';
+import { TransactionStore } from './transaction.reducer';
 import { groupTransactions } from './transaction.util';
 
 const selectTransactionFeature =
-  createFeatureSelector<transactionStore>('transaction');
+  createFeatureSelector<TransactionStore>('transaction');
 
 export const selectTransactionsList = createSelector(
   selectTransactionFeature,

@@ -1,7 +1,7 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { settingStore } from './setting.reducer';
+import { SettingStore } from './setting.reducer';
 
-const selectSettingsFeature = createFeatureSelector<settingStore>('setting');
+const selectSettingsFeature = createFeatureSelector<SettingStore>('setting');
 
 export const selectDateRange = createSelector(
   selectSettingsFeature,

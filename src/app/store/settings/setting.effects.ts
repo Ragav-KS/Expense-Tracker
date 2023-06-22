@@ -7,8 +7,9 @@ import {
 } from '@ngrx/effects';
 import { map, switchMap, tap } from 'rxjs';
 import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
-import { setLastSyncDate } from './setting.actions';
+import { setDateRange, setLastSyncDate } from './setting.actions';
 import { monthStart } from './setting.util';
+import { refresh } from '../transaction/transaction.actions';
 
 @Injectable()
 export class SettingEffects {
@@ -33,5 +34,9 @@ export class SettingEffects {
         tap(({ date }) => this.prefSrv.set('lastSync', date.toISOString()))
       ),
     { dispatch: false }
+  );
+
+  refreshAfterDateRangeChange$ = createEffect(() =>
+    this.actions$.pipe(ofType(setDateRange), map(refresh))
   );
 }

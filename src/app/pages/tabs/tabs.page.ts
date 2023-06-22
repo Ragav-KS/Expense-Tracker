@@ -1,28 +1,33 @@
-import { Component, OnInit } from '@angular/core';
-import { JobsService } from 'src/app/services/Jobs/jobs.service';
+import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { DateRangeSelectComponent } from './date-range-select/date-range-select.component';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: './tabs.page.html',
   styleUrls: ['./tabs.page.scss'],
 })
-export class TabsPage implements OnInit {
-  constructor(private jobsSrv: JobsService) {}
+export class TabsPage {
+  dateRangeMode: string = 'Current Month';
 
-  ngOnInit() {}
+  constructor(private modalCtrl: ModalController) {}
 
-  handleRefresh(event: Event) {
-    this.jobsSrv
-      .fetchMails()
-      .catch((err) => {
-        if (err.message === 'Unauthenticated') {
-          // Add logic to show alert/toast
-          return;
-        }
-        console.error(err);
+  handleChooseDateRange() {
+    this.modalCtrl
+      .create({
+        component: DateRangeSelectComponent,
+        initialBreakpoint: 0.6,
+        breakpoints: [0, 0.6, 1],
+        handleBehavior: 'cycle',
       })
-      .finally(() => {
-        (event.target as HTMLIonRefresherElement).complete();
+      .then((modal) => {
+        modal.onDidDismiss<{ label: string }>().then(({ data, role }) => {
+          if (role === 'confirm') {
+            this.dateRangeMode = data!.label;
+          }
+        });
+
+        return modal.present();
       });
   }
 }
