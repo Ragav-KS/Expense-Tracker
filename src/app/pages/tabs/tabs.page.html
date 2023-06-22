@@ -2,8 +2,9 @@
   <ion-header>
     <ion-toolbar>
       <ion-title> {{ dateRangeMode }} </ion-title>
+
       <ion-buttons slot="primary">
-        <ion-button (click)="handleChooseRange()">
+        <ion-button (click)="handleChooseDateRange()">
           <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
         </ion-button>
       </ion-buttons>
@@ -15,6 +16,7 @@
       <ion-icon name="home"></ion-icon>
       Home
     </ion-tab-button>
+
     <ion-tab-button tab="transactions">
       <ion-icon name="card"></ion-icon>
       Transactions

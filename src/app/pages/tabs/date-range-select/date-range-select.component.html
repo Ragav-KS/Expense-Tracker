@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Choose Time-frame</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button (click)="cancel()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-radio-group [(ngModel)]="mode">
+    <ion-item *ngFor="let option of options">
+      <ion-radio [value]="option"> {{ option.label }} </ion-radio>
+    </ion-item>
+  </ion-radio-group>
+
+  <ion-item *ngIf="mode.value === 'custom'">
+    <ion-label>Start Date</ion-label>
+    <ion-datetime-button datetime="startDate"></ion-datetime-button>
+  </ion-item>
+
+  <ion-item *ngIf="mode.value === 'custom'">
+    <ion-label>End Date</ion-label>
+    <ion-datetime-button datetime="endDate"></ion-datetime-button>
+  </ion-item>
+
+  <ion-button expand="block" (click)="confirm()">Ok</ion-button>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="startDate"
+        presentation="date"
+        [showDefaultButtons]="true"
+        [max]="dateToString(endDate)"
+        [ngModel]="dateToString(startDate)"
+        (ngModelChange)="startDate = stringToDate($event)"
+      ></ion-datetime>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="endDate"
+        presentation="date"
+        [showDefaultButtons]="true"
+        [min]="dateToString(startDate)"
+        [max]="dateToString(today)"
+        [ngModel]="dateToString(endDate)"
+        (ngModelChange)="endDate = stringToDate($event)"
+      ></ion-datetime>
+    </ng-template>
+  </ion-modal>
+</ion-content>

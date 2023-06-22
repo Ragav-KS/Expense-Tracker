@@ -1,71 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertController, AlertInput } from '@ionic/angular';
-import { Store } from '@ngrx/store';
-import { JobsService } from 'src/app/services/Jobs/jobs.service';
-import { AppState } from 'src/app/store/app.index';
-import { setDateRange } from 'src/app/store/settings/setting.actions';
+import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { DateRangeSelectComponent } from './date-range-select/date-range-select.component';
 
 @Component({
   selector: 'app-tabs',
   templateUrl: './tabs.page.html',
   styleUrls: ['./tabs.page.scss'],
 })
-export class TabsPage implements OnInit {
+export class TabsPage {
   dateRangeMode: string = 'Current Month';
-  alertInputs: AlertInput[] = [
-    {
-      name: 'current',
-      type: 'radio',
-      label: 'Current Month',
-      value: 'current',
-    },
-    {
-      name: 'previous',
-      type: 'radio',
-      label: 'Previous Month',
-      value: 'previous',
-    },
-  ];
 
-  constructor(
-    private jobsSrv: JobsService,
-    private store: Store<AppState>,
-    private alertController: AlertController
-  ) {}
+  constructor(private modalCtrl: ModalController) {}
 
-  ngOnInit() {}
-
-  async handleChooseRange() {
-    const alert = await this.alertController.create({
-      header: 'Choose Time-frame',
-      buttons: [
-        {
-          text: 'Ok',
-          handler: (value: 'current' | 'previous') => {
-            this.store.dispatch(setDateRange({ mode: value }));
-            this.dateRangeMode = this.alertInputs.find(
-              (input) => input.value === value
-            )?.label!;
-          },
-        },
-      ],
-      inputs: this.alertInputs,
-    });
-    await alert.present();
-  }
-
-  handleRefresh(event: Event) {
-    this.jobsSrv
-      .fetchMails()
-      .catch((err) => {
-        if (err.message === 'Unauthenticated') {
-          // Add logic to show alert/toast
-          return;
-        }
-        console.error(err);
+  handleChooseDateRange() {
+    this.modalCtrl
+      .create({
+        component: DateRangeSelectComponent,
       })
-      .finally(() => {
-        (event.target as HTMLIonRefresherElement).complete();
+      .then((modal) => {
+        modal.onDidDismiss<{ label: string }>().then(({ data, role }) => {
+          if (role === 'confirm') {
+            this.dateRangeMode = data!.label;
+          }
+        });
+
+        return modal.present();
       });
   }
 }
