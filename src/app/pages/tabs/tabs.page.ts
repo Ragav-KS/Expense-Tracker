@@ -16,6 +16,9 @@ export class TabsPage {
     this.modalCtrl
       .create({
         component: DateRangeSelectComponent,
+        initialBreakpoint: 0.7,
+        breakpoints: [0, 0.5, 0.7, 1],
+        handleBehavior: 'cycle',
       })
       .then((modal) => {
         modal.onDidDismiss<{ label: string }>().then(({ data, role }) => {
