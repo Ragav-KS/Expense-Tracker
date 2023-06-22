@@ -18,9 +18,9 @@ export const transactionReducer = createReducer(
   initialState,
   on(load, (state, action) => {
     return {
-      list: action.list ? action.list : state.list,
-      expensesSum: action.expensesSum ? action.expensesSum : state.expensesSum,
-      incomeSum: action.incomeSum ? action.incomeSum : state.incomeSum,
+      list: action.list ?? state.list,
+      expensesSum: action.expensesSum ?? state.expensesSum,
+      incomeSum: action.incomeSum ?? state.incomeSum,
     };
   })
 );
