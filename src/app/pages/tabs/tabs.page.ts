@@ -16,8 +16,8 @@ export class TabsPage {
     this.modalCtrl
       .create({
         component: DateRangeSelectComponent,
-        initialBreakpoint: 0.7,
-        breakpoints: [0, 0.5, 0.7, 1],
+        initialBreakpoint: 0.6,
+        breakpoints: [0, 0.6, 1],
         handleBehavior: 'cycle',
       })
       .then((modal) => {
