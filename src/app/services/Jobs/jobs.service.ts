@@ -1,12 +1,16 @@
 import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { concatMap, filter, from, map, Observable } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
+import { AppState } from 'src/app/store/app.index';
+import { setLastSyncDate } from 'src/app/store/settings/setting.actions';
+import { selectLastSyncDate } from 'src/app/store/settings/setting.selectors';
+import { refresh } from 'src/app/store/transaction/transaction.actions';
 import { banksConfig } from 'src/res/banksConfig';
 import { GmailService } from '../Gmail/gmail.service';
 import { ContentProcessorService } from '../Processors/content-processor.service';
 import { MailProcessorService } from '../Processors/mail-processor.service';
 import { RepositoryService } from '../Repositories/repository.service';
-import { PreferenceStoreService } from '../Storage/preference-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,19 +24,12 @@ export class JobsService {
     private mailProcessorSrv: MailProcessorService,
     private contentProcessorSrv: ContentProcessorService,
     private repoSrv: RepositoryService,
-    private prefSrv: PreferenceStoreService
+    private store: Store<AppState>
   ) {
     this.bankConfig = banksConfig.find((item) => item.name === 'HDFC')!;
 
-    prefSrv.get('lastSync').then((lastSync) => {
-      if (!lastSync) {
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-
-        this.lastSync = startOfMonth;
-      } else {
-        this.lastSync = new Date(lastSync);
-      }
+    this.store.select(selectLastSyncDate).subscribe((date) => {
+      this.lastSync = date;
     });
   }
 
@@ -42,9 +39,10 @@ export class JobsService {
         next: (transaction) => {
           console.log(transaction);
         },
-        complete: () => {
-          this.repoSrv.save();
-          this.prefSrv.set('lastSync', new Date().toISOString());
+        complete: async () => {
+          await this.repoSrv.save();
+          this.store.dispatch(refresh());
+          this.store.dispatch(setLastSyncDate({ date: new Date() }));
           resolve();
         },
         error: (err) => {

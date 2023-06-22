@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
+import { Store } from '@ngrx/store';
 import { ITransaction } from 'src/app/entities/transaction';
-import { DataService } from 'src/app/services/Core/data.service';
+import { AppState } from 'src/app/store/app.index';
+import { addTransaction } from 'src/app/store/transaction/transaction.actions';
 
 @Component({
   selector: 'app-transaction-entry',
@@ -39,7 +41,7 @@ export class TransactionFormComponent implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private DataSrv: DataService
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
@@ -87,10 +89,7 @@ export class TransactionFormComponent implements OnInit {
     this.transaction.mode = this.modeControl.value!;
     this.transaction.transactionType = this.transactionTypeControl.value!;
 
-    await this.DataSrv.createTransaction(this.transaction).catch((err) => {
-      // TODO: show error message in a modal/toast
-      console.log(err);
-    });
+    this.store.dispatch(addTransaction({ transaction: this.transaction }));
 
     this.modalCtrl.dismiss(this.transaction);
   }

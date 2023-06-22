@@ -3,8 +3,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 import { ITransaction } from 'src/app/entities/transaction';
-import { DataService } from 'src/app/services/Core/data.service';
 import { TransactionFormComponent } from './transaction-form/transaction-form.component';
+import { JobsService } from 'src/app/services/Jobs/jobs.service';
+import { AppState } from 'src/app/store/app.index';
+import { Store } from '@ngrx/store';
+import {
+  selectGroupedTransactionsList,
+  selectTransactionsList,
+} from 'src/app/store/transaction/transaction.selectors';
+import { removeTransaction } from 'src/app/store/transaction/transaction.actions';
 
 @Component({
   selector: 'app-transactions',
@@ -19,41 +26,35 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private modalCtrl: ModalController,
-    private DataSrv: DataService
+    private jobsSrv: JobsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit() {
-    this.transactionsListSubscription = this.DataSrv.transactionsList.subscribe(
-      (transactions) => {
-        this.transactionsList = transactions;
-        this.groupTransactions();
-      }
-    );
+    this.transactionsListSubscription = this.store
+      .select(selectGroupedTransactionsList)
+      .subscribe((transactions) => {
+        this.transactionsGrouped = transactions;
+      });
   }
 
   ngOnDestroy(): void {
     this.transactionsListSubscription.unsubscribe();
   }
 
-  groupTransactions() {
-    let transactionsGrouped = new Map();
-
-    this.transactionsList.forEach((transaction) => {
-      const date = transaction.date;
-      const dateKey = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
-      ).getTime();
-      const transactions = transactionsGrouped.get(dateKey);
-      if (transactions) {
-        transactions.push(transaction);
-      } else {
-        transactionsGrouped.set(dateKey, [transaction]);
-      }
-    });
-
-    this.transactionsGrouped = transactionsGrouped;
+  handleRefresh(event: Event) {
+    this.jobsSrv
+      .fetchMails()
+      .catch((err) => {
+        if (err.message === 'Unauthenticated') {
+          // Add logic to show alert/toast
+          return;
+        }
+        console.error(err);
+      })
+      .finally(() => {
+        (event.target as HTMLIonRefresherElement).complete();
+      });
   }
 
   editTransaction(transaction: ITransaction) {
@@ -86,10 +87,7 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   deleteTransaction(transaction: ITransaction) {
-    this.DataSrv.deleteTransaction(transaction).catch((err) => {
-      // TODO: show error message in a modal/toast
-      console.error(err);
-    });
+    this.store.dispatch(removeTransaction({ transaction }));
   }
 
   keyDescOrder = (

@@ -1,6 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { DataService } from 'src/app/services/Core/data.service';
+import { AppState } from 'src/app/store/app.index';
+import {
+  selectExpensesSum,
+  selectIncomeSum,
+} from 'src/app/store/transaction/transaction.selectors';
 
 @Component({
   selector: 'app-summary',
@@ -8,7 +13,7 @@ import { DataService } from 'src/app/services/Core/data.service';
   styleUrls: ['./summary.component.scss'],
 })
 export class SummaryComponent implements OnInit, OnDestroy {
-  constructor(private DataSrv: DataService) {}
+  constructor(private store: Store<AppState>) {}
 
   expenseSumSubscription!: Subscription;
   incomeSumSubscription!: Subscription;
@@ -17,17 +22,17 @@ export class SummaryComponent implements OnInit, OnDestroy {
   incomeSum: number = 0;
 
   ngOnInit() {
-    this.expenseSumSubscription = this.DataSrv.expensesSum.subscribe(
-      (expensesSum) => {
+    this.expenseSumSubscription = this.store
+      .select(selectExpensesSum)
+      .subscribe((expensesSum) => {
         this.expensesSum = expensesSum;
-      }
-    );
+      });
 
-    this.incomeSumSubscription = this.DataSrv.incomeSum.subscribe(
-      (incomeSum) => {
+    this.incomeSumSubscription = this.store
+      .select(selectIncomeSum)
+      .subscribe((incomeSum) => {
         this.incomeSum = incomeSum;
-      }
-    );
+      });
   }
 
   ngOnDestroy(): void {

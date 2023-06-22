@@ -4,20 +4,24 @@ import { IParty, PartyEntity } from 'src/app/entities/party';
 import { ITransaction, TransactionEntity } from 'src/app/entities/transaction';
 import { Repository } from 'typeorm';
 import { SqliteStorageService } from '../Storage/sqlite-storage.service';
+import { AppState } from 'src/app/store/app.index';
+import { Store } from '@ngrx/store';
+import { refresh } from 'src/app/store/transaction/transaction.actions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RepositoryService {
-  public dataRefreshed = new EventEmitter<void>();
-
   public mailsRepo!: Repository<IMail>;
   public transactionsRepo!: Repository<ITransaction>;
   public partiesRepo!: Repository<IParty>;
 
-  constructor(private sqliteSrv: SqliteStorageService) {
+  constructor(
+    private sqliteSrv: SqliteStorageService,
+    private store: Store<AppState>
+  ) {
     this.loadRepo().then(() => {
-      this.dataRefreshed.emit();
+      this.store.dispatch(refresh());
     });
   }
 
@@ -36,6 +40,5 @@ export class RepositoryService {
 
   async save() {
     await this.sqliteSrv.saveDB();
-    this.dataRefreshed.emit();
   }
 }
