@@ -23,11 +23,9 @@ export class HomePage implements OnInit, OnDestroy {
   loggedIn = false;
 
   ngOnInit(): void {
-    this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe(
-      async (value) => {
-        this.loggedIn = value;
-      }
-    );
+    this.loggedInSubscription = this.gmailSrv.loggedIn.subscribe((value) => {
+      this.loggedIn = value;
+    });
   }
 
   handleLogin() {
