@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
 import { reducers } from './store/app.index';
 import { SettingEffects } from './store/settings/setting.effects';
 import { TransactionEffects } from './store/transaction/transaction.effects';
+import { MailEffects } from './store/mail/mail.effects';
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,11 +23,10 @@ import { TransactionEffects } from './store/transaction/transaction.effects';
     AppRoutingModule,
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument({
-      maxAge: 25,
       logOnly: !isDevMode(),
       trace: true,
     }),
-    EffectsModule.forRoot([TransactionEffects, SettingEffects]),
+    EffectsModule.forRoot([TransactionEffects, SettingEffects, MailEffects]),
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
