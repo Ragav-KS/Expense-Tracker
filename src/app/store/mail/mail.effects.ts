@@ -4,14 +4,14 @@ import { Store } from '@ngrx/store';
 import {
   EMPTY,
   catchError,
+  combineLatest,
   concatMap,
   exhaustMap,
   from,
   map,
   of,
   repeat,
-  switchMap,
-  timer,
+  tap,
 } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
@@ -39,6 +39,8 @@ export class MailEffects {
     private contentProcessorSrv: ContentProcessorService,
     private repoSrv: RepositoryService
   ) {}
+
+  lastMail: string = '';
 
   loadMailList$ = createEffect(() =>
     this.actions$.pipe(
@@ -68,21 +70,25 @@ export class MailEffects {
         return mailsRepo
           .query(
             `
-                VALUES ${placeHolders}
+                WITH v(id) AS (VALUES ${placeHolders})
+                SELECT v.id FROM v
                 EXCEPT
                 SELECT id FROM mails;
               `,
             mailIdList
           )
-          .then((arr: { column1: string }[]) => {
-            return arr.map((obj) => obj.column1);
+          .then((arr: { id: string; lastMail?: boolean }[]) => {
+            arr.at(-1)!.lastMail = true;
+            return arr;
           });
       }),
       concatMap((mailList) => {
         if (mailList.length) return from(mailList);
         else throw new Error('Mail List empty');
       }),
-      map((id) => loadTransactionMail({ mailId: id })),
+      map(({ id, lastMail }) =>
+        loadTransactionMail({ mailId: id, skipSave: !lastMail })
+      ),
       catchError((error: Error) => {
         if (error.message === 'Mail List empty') return of(loadMailsSuccess());
         else return EMPTY;
@@ -94,33 +100,45 @@ export class MailEffects {
   loadTransactionMail$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadTransactionMail),
-      concatMap(({ mailId }) => this.gmailSrv.getMail(mailId)),
-      map((mail) => {
-        const payload = this.mailProcessorSrv.getPayload(mail);
-        const extractedBody = this.contentProcessorSrv.extractText(
-          payload.body
-        );
-        const transaction = this.contentProcessorSrv.extractData(
-          extractedBody,
-          new Date(payload.date)
-        );
+      concatMap(({ mailId, skipSave }) => {
+        return combineLatest([
+          of(skipSave),
+          from(this.gmailSrv.getMail(mailId)).pipe(
+            map((mail) => {
+              const payload = this.mailProcessorSrv.getPayload(mail);
+              const extractedBody = this.contentProcessorSrv.extractText(
+                payload.body
+              );
+              const transaction = this.contentProcessorSrv.extractData(
+                extractedBody,
+                new Date(payload.date)
+              );
 
-        return {
-          id: mail.id,
-          transaction: transaction,
-        } as IMail;
+              return {
+                id: mail.id,
+                transaction: transaction,
+              } as IMail;
+            }),
+            concatMap((mail) => {
+              const mailsRepo = this.repoSrv.mailsRepo;
+              return mailsRepo.save(mail, {});
+            })
+          ),
+        ]);
       }),
-      concatMap((mail) => {
-        const mailsRepo = this.repoSrv.mailsRepo;
-        return mailsRepo.save(mail);
-      }),
-      switchMap(() => timer(1000)),
-      concatMap(() => this.repoSrv.save()),
-      concatMap(() => [
-        setLastSyncDate({ date: new Date() }),
-        refresh(),
-        loadMailsSuccess(),
-      ])
+      concatMap(([skip, mail]) => {
+        if (skip) {
+          return EMPTY;
+        } else {
+          return from(this.repoSrv.save()).pipe(
+            concatMap(() => [
+              setLastSyncDate({ date: new Date() }),
+              refresh(),
+              loadMailsSuccess(),
+            ])
+          );
+        }
+      })
     )
   );
 }
