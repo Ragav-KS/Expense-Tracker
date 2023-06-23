@@ -85,6 +85,6 @@ export class TransactionsPage implements OnInit, OnDestroy {
     a: KeyValue<number, any>,
     b: KeyValue<number, any>
   ): number => {
-    return a.key > b.key ? -1 : b.key > a.key ? 1 : 0;
+    return b.key - a.key;
   };
 }
