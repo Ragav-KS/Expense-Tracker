@@ -1,7 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { concatMap, exhaustMap, from, map, switchMap, timer } from 'rxjs';
+import {
+  EMPTY,
+  catchError,
+  concatMap,
+  exhaustMap,
+  from,
+  map,
+  of,
+  repeat,
+  switchMap,
+  timer,
+} from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/content-processor.service';
@@ -64,8 +75,16 @@ export class MailEffects {
             return arr.map((obj) => obj.column1);
           });
       }),
-      concatMap((mailList) => from(mailList)),
-      map((id) => loadTransactionMail({ mailId: id }))
+      concatMap((mailList) => {
+        if (mailList.length) return from(mailList);
+        else throw new Error('Mail List empty');
+      }),
+      map((id) => loadTransactionMail({ mailId: id })),
+      catchError((error: Error) => {
+        if (error.message === 'Mail List empty') return of(loadMailsSuccess());
+        else return EMPTY;
+      }),
+      repeat()
     )
   );
 
