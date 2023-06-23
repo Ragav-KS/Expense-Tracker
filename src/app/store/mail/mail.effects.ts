@@ -58,6 +58,9 @@ export class MailEffects {
       }),
       map((mailList) => mailList.map((mail) => mail.id!)),
       exhaustMap((mailIdList) => {
+        if (mailIdList.length === 0) {
+          throw new Error('Mail List empty');
+        }
         const placeHolders = mailIdList.map((_) => `(?)`).join(', ');
 
         const mailsRepo = this.repoSrv.mailsRepo;
