@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { concatMap, exhaustMap, from, map, tap } from 'rxjs';
+import { concatMap, exhaustMap, from, map, switchMap, timer } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { ContentProcessorService } from 'src/app/services/Processors/content-processor.service';
@@ -9,8 +9,14 @@ import { MailProcessorService } from 'src/app/services/Processors/mail-processor
 import { RepositoryService } from 'src/app/services/Repositories/repository.service';
 import { banksConfig } from 'src/res/banksConfig';
 import { AppState } from '../app.index';
+import { setLastSyncDate } from '../settings/setting.actions';
 import { selectBank, selectLastSyncDate } from '../settings/setting.selectors';
-import { loadMails, loadTransactionMail } from './mail.actions';
+import { refresh } from '../transaction/transaction.actions';
+import {
+  loadMails,
+  loadMailsSuccess,
+  loadTransactionMail,
+} from './mail.actions';
 
 @Injectable()
 export class MailEffects {
@@ -31,8 +37,8 @@ export class MailEffects {
         this.store.select(selectLastSyncDate),
       ]),
       exhaustMap(([_, bank, lastSync]) => {
-        let bankConfig = banksConfig.find((item) => item.name === bank)!;
-        let query = this.gmailSrv.buildQuery({
+        const bankConfig = banksConfig.find((item) => item.name === bank)!;
+        const query = this.gmailSrv.buildQuery({
           from: bankConfig.gmailFilter.from,
           after: lastSync,
           exclude: bankConfig.gmailFilter.exclude,
@@ -63,28 +69,36 @@ export class MailEffects {
     )
   );
 
-  loadTransactionMail$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(loadTransactionMail),
-        concatMap(({ mailId }) => this.gmailSrv.getMail(mailId)),
-        map((mail) => {
-          const payload = this.mailProcessorSrv.getPayload(mail);
-          const extractedBody = this.contentProcessorSrv.extractText(
-            payload.body
-          );
-          const transaction = this.contentProcessorSrv.extractData(
-            extractedBody,
-            new Date(payload.date)
-          );
+  loadTransactionMail$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadTransactionMail),
+      concatMap(({ mailId }) => this.gmailSrv.getMail(mailId)),
+      map((mail) => {
+        const payload = this.mailProcessorSrv.getPayload(mail);
+        const extractedBody = this.contentProcessorSrv.extractText(
+          payload.body
+        );
+        const transaction = this.contentProcessorSrv.extractData(
+          extractedBody,
+          new Date(payload.date)
+        );
 
-          return {
-            id: mail.id,
-            transaction: transaction,
-          } as IMail;
-        }),
-        tap((mail) => console.log(mail))
-      ),
-    { dispatch: false }
+        return {
+          id: mail.id,
+          transaction: transaction,
+        } as IMail;
+      }),
+      concatMap((mail) => {
+        const mailsRepo = this.repoSrv.mailsRepo;
+        return mailsRepo.save(mail);
+      }),
+      switchMap(() => timer(1000)),
+      concatMap(() => this.repoSrv.save()),
+      concatMap(() => [
+        setLastSyncDate({ date: new Date() }),
+        refresh(),
+        loadMailsSuccess(),
+      ])
+    )
   );
 }

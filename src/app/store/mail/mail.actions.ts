@@ -6,3 +6,5 @@ export const loadTransactionMail = createAction(
   '[Mail] load transaction from Mail',
   props<{ mailId: string }>()
 );
+
+export const loadMailsSuccess = createAction('[Mail] load Successfull');

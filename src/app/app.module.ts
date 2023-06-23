@@ -23,7 +23,6 @@ import { MailEffects } from './store/mail/mail.effects';
     AppRoutingModule,
     StoreModule.forRoot(reducers),
     StoreDevtoolsModule.instrument({
-      maxAge: 25,
       logOnly: !isDevMode(),
       trace: true,
     }),
