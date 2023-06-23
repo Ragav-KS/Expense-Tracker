@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { JobsService } from 'src/app/services/Jobs/jobs.service';
+import { AppState } from 'src/app/store/app.index';
+import { loadMails } from 'src/app/store/mail/mail.actions';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +12,11 @@ import { JobsService } from 'src/app/services/Jobs/jobs.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage implements OnInit, OnDestroy {
-  constructor(private gmailSrv: GmailService, private jobsSrv: JobsService) {}
+  constructor(
+    private gmailSrv: GmailService,
+    private jobsSrv: JobsService,
+    private store: Store<AppState>
+  ) {}
 
   loggedInSubscription!: Subscription;
 
@@ -28,18 +35,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: Event) {
-    this.jobsSrv
-      .fetchMails()
-      .catch((err) => {
-        if (err.message === 'Unauthenticated') {
-          // Add logic to show alert/toast
-          return;
-        }
-        console.error(err);
-      })
-      .finally(() => {
-        (event.target as HTMLIonRefresherElement).complete();
-      });
+    this.store.dispatch(loadMails());
   }
 
   ngOnDestroy(): void {
