@@ -1,17 +1,15 @@
 import { KeyValue } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Subscription } from 'rxjs';
-import { ITransaction } from 'src/app/entities/transaction';
-import { TransactionFormComponent } from './transaction-form/transaction-form.component';
-import { JobsService } from 'src/app/services/Jobs/jobs.service';
-import { AppState } from 'src/app/store/app.index';
+import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import {
-  selectGroupedTransactionsList,
-  selectTransactionsList,
-} from 'src/app/store/transaction/transaction.selectors';
+import { Subscription, first } from 'rxjs';
+import { ITransaction } from 'src/app/entities/transaction';
+import { AppState } from 'src/app/store/app.index';
+import { loadMails, loadMailsSuccess } from 'src/app/store/mail/mail.actions';
 import { removeTransaction } from 'src/app/store/transaction/transaction.actions';
+import { selectGroupedTransactionsList } from 'src/app/store/transaction/transaction.selectors';
+import { TransactionFormComponent } from './transaction-form/transaction-form.component';
 
 @Component({
   selector: 'app-transactions',
@@ -26,8 +24,8 @@ export class TransactionsPage implements OnInit, OnDestroy {
 
   constructor(
     private modalCtrl: ModalController,
-    private jobsSrv: JobsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private actions$: Actions
   ) {}
 
   ngOnInit() {
@@ -43,18 +41,11 @@ export class TransactionsPage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: Event) {
-    this.jobsSrv
-      .fetchMails()
-      .catch((err) => {
-        if (err.message === 'Unauthenticated') {
-          // Add logic to show alert/toast
-          return;
-        }
-        console.error(err);
-      })
-      .finally(() => {
-        (event.target as HTMLIonRefresherElement).complete();
-      });
+    this.store.dispatch(loadMails());
+
+    this.actions$.pipe(ofType(loadMailsSuccess), first()).subscribe(() => {
+      (event.target as HTMLIonRefresherElement).complete();
+    });
   }
 
   editTransaction(transaction: ITransaction) {

@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Subscription, first } from 'rxjs';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
-import { JobsService } from 'src/app/services/Jobs/jobs.service';
 import { AppState } from 'src/app/store/app.index';
-import { loadMails } from 'src/app/store/mail/mail.actions';
+import { loadMails, loadMailsSuccess } from 'src/app/store/mail/mail.actions';
 
 @Component({
   selector: 'app-home',
@@ -14,8 +14,8 @@ import { loadMails } from 'src/app/store/mail/mail.actions';
 export class HomePage implements OnInit, OnDestroy {
   constructor(
     private gmailSrv: GmailService,
-    private jobsSrv: JobsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private actions$: Actions
   ) {}
 
   loggedInSubscription!: Subscription;
@@ -36,6 +36,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   handleRefresh(event: Event) {
     this.store.dispatch(loadMails());
+
+    this.actions$.pipe(ofType(loadMailsSuccess), first()).subscribe(() => {
+      (event.target as HTMLIonRefresherElement).complete();
+    });
   }
 
   ngOnDestroy(): void {
