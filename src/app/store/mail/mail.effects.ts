@@ -11,7 +11,6 @@ import {
   map,
   of,
   repeat,
-  tap,
 } from 'rxjs';
 import { IMail } from 'src/app/entities/mail';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
@@ -78,7 +77,9 @@ export class MailEffects {
             mailIdList
           )
           .then((arr: { id: string; lastMail?: boolean }[]) => {
-            arr.at(-1)!.lastMail = true;
+            if (arr.at(-1)) {
+              arr.at(-1)!.lastMail = true;
+            }
             return arr;
           });
       }),
