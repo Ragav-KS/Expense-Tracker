@@ -4,10 +4,10 @@ import { Store } from '@ngrx/store';
 import {
   EMPTY,
   catchError,
-  combineLatest,
   concatMap,
   exhaustMap,
   from,
+  iif,
   map,
   of,
   repeat,
@@ -101,45 +101,37 @@ export class MailEffects {
   loadTransactionMail$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadTransactionMail),
-      concatMap(({ mailId, skipSave }) => {
-        return combineLatest([
-          of(skipSave),
-          from(this.gmailSrv.getMail(mailId)).pipe(
-            map((mail) => {
-              const payload = this.mailProcessorSrv.getPayload(mail);
-              const extractedBody = this.contentProcessorSrv.extractText(
-                payload.body
-              );
-              const transaction = this.contentProcessorSrv.extractData(
-                extractedBody,
-                new Date(payload.date)
-              );
+      concatMap(({ mailId, skipSave }) =>
+        from(this.gmailSrv.getMail(mailId)).pipe(
+          map((mail) => {
+            const payload = this.mailProcessorSrv.getPayload(mail);
+            const extractedBody = this.contentProcessorSrv.extractText(
+              payload.body
+            );
+            const transaction = this.contentProcessorSrv.extractData(
+              extractedBody,
+              new Date(payload.date)
+            );
 
-              return {
-                id: mail.id,
-                transaction: transaction,
-              } as IMail;
-            }),
-            concatMap((mail) => {
-              const mailsRepo = this.repoSrv.mailsRepo;
-              return mailsRepo.save(mail, {});
-            })
+            return {
+              id: mail.id,
+              transaction: transaction,
+            } as IMail;
+          }),
+          concatMap((mail) => {
+            const mailsRepo = this.repoSrv.mailsRepo;
+            return mailsRepo.save(mail);
+          }),
+          concatMap((mail) =>
+            iif(() => skipSave ?? false, EMPTY, this.repoSrv.save())
           ),
-        ]);
-      }),
-      concatMap(([skip, mail]) => {
-        if (skip) {
-          return EMPTY;
-        } else {
-          return from(this.repoSrv.save()).pipe(
-            concatMap(() => [
-              setLastSyncDate({ date: new Date() }),
-              refresh(),
-              loadMailsSuccess(),
-            ])
-          );
-        }
-      })
+          concatMap((val) => [
+            setLastSyncDate({ date: new Date() }),
+            refresh(),
+            loadMailsSuccess(),
+          ])
+        )
+      )
     )
   );
 }
