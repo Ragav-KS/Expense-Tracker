@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import {
+  Actions,
+  ROOT_EFFECTS_INIT,
+  createEffect,
+  ofType,
+} from '@ngrx/effects';
 import { concatMap, map, of, switchMap } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
 import { login, setLoginState } from './gauth.actions';
+import { setAppLoadStatus } from '../settings/setting.actions';
 
 @Injectable()
 export class GAuthEffects {
@@ -13,6 +19,17 @@ export class GAuthEffects {
     private prefSrv: PreferenceStoreService,
     private gmailSrv: GmailService
   ) {}
+
+  initGauth$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ROOT_EFFECTS_INIT),
+      concatMap(() =>
+        GoogleAuth.initialize({ androidClientID: '', webClientID: '' })
+      ),
+      concatMap(() => this.gmailSrv.initialize()),
+      map(() => setAppLoadStatus({ googleScripts: 'Loaded' }))
+    )
+  );
 
   login$ = createEffect(() =>
     this.actions$.pipe(

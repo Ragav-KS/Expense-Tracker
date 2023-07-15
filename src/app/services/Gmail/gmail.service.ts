@@ -1,8 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import format from 'date-fns/format';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { get } from 'scriptjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
-import credentials from 'src/res/credentials.json';
 import { PreferenceStoreService } from '../Storage/preference-store.service';
 
 @Injectable({
@@ -20,29 +20,39 @@ export class GmailService {
   public loggedIn = new BehaviorSubject<boolean>(false);
   public loginEmitter = new EventEmitter<void>();
 
-  constructor(private prefSrv: PreferenceStoreService) {
-    GoogleAuth.initialize({
-      androidClientID: credentials.androidClientID,
-      webClientID: credentials.webClientID,
-    });
+  constructor(private prefSrv: PreferenceStoreService) {}
 
-    this.gapiLoadClient();
+  public async initialize() {
+    return this.loadScript().then(() => {
+      return this.gapiLoadClient();
+    });
+  }
+
+  private loadScript() {
+    return new Promise<void>((resolve, reject) => {
+      get('https://apis.google.com/js/api.js', () => {
+        console.log('>>>> [Gmail Service] Google GAPI Script loaded');
+        resolve();
+      });
+    });
   }
 
   private gapiLoadClient() {
-    gapi.load('client', () => {
-      gapi.client
-        .init({
-          discoveryDocs: [this.discoveryDoc],
-        })
-        .then(() => {
-          this.gapiLoaded = true;
-          console.log('>>>> [GAuth] client load success');
-          this.gapiLoadedEmitter.emit();
-        })
-        .catch((err) => {
-          new Error('gapi client load failed.' + err);
-        });
+    return new Promise<void>((resolve, reject) => {
+      gapi.load('client', () => {
+        gapi.client
+          .init({
+            discoveryDocs: [this.discoveryDoc],
+          })
+          .then(() => {
+            console.log('>>>> [GAuth] client load success');
+            resolve();
+          })
+          .catch((err) => {
+            new Error('gapi client load failed.' + err);
+            reject(err);
+          });
+      });
     });
   }
 
