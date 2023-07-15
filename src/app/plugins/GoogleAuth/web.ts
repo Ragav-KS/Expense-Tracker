@@ -10,8 +10,7 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
 
   private tokenClient!: google.accounts.oauth2.TokenClient;
 
-  private clientId!: string;
-  private access_token!: string;
+  private accessToken!: string;
 
   private accessTokenEmitter: EventEmitter<string> = new EventEmitter();
 
@@ -47,17 +46,17 @@ export class GoogleAuthWeb extends WebPlugin implements GoogleAuthPlugin {
   public async getToken(options: {
     selectedAccount?: string;
   }): Promise<{ token: string }> {
-    this.tokenClient.requestAccessToken({
-      hint: options.selectedAccount,
-    });
-
     return new Promise((resolve, reject) => {
-      this.accessTokenEmitter.subscribe((token) => {
-        this.access_token = token;
+      this.accessTokenEmitter.pipe(take(1)).subscribe((token) => {
+        this.accessToken = token;
 
         resolve({
-          token: this.access_token,
+          token: this.accessToken,
         });
+      });
+
+      this.tokenClient.requestAccessToken({
+        hint: options.selectedAccount,
       });
     });
   }

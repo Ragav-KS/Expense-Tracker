@@ -32,12 +32,11 @@ export class GmailService {
             discoveryDocs: [this.discoveryDoc],
           })
           .then(() => {
-            console.log('>>>> [GAuth] client load success');
+            console.log('>>>> [Gmail Service] client load success');
             resolve();
           })
           .catch((err) => {
-            new Error('gapi client load failed.' + err);
-            reject(err);
+            throw err.result.error;
           });
       });
     });
@@ -50,18 +49,14 @@ export class GmailService {
   }
 
   public async getUserID(): Promise<string> {
-    let selectedUserID!: string;
-
-    await gapi.client.gmail.users
+    return gapi.client.gmail.users
       .getProfile({ userId: 'me' })
       .then((res) => {
-        selectedUserID = res.result.emailAddress!;
+        return res.result.emailAddress!;
       })
       .catch((err) => {
-        throw new Error('Failed to fetch user profile.' + err);
+        throw err.result.error;
       });
-
-    return selectedUserID;
   }
 
   public buildQuery({
@@ -102,9 +97,7 @@ export class GmailService {
     labelIds?: string[];
     query?: string;
   }) {
-    let response!: gapi.client.Response<gapi.client.gmail.ListMessagesResponse>;
-
-    await gapi.client.gmail.users.messages
+    return gapi.client.gmail.users.messages
       .list({
         userId: userId,
         labelIds: labelIds,
@@ -113,34 +106,28 @@ export class GmailService {
         maxResults: 500,
       })
       .then((res) => {
-        response = res;
+        return res.result;
       })
       .catch((err) => {
         throw err.result.error;
       });
-
-    return response.result;
   }
 
   public async getMail(
     mailId: string,
     userId: string = 'me'
   ): Promise<gapi.client.gmail.Message> {
-    let response!: gapi.client.Response<gapi.client.gmail.Message>;
-
-    await gapi.client.gmail.users.messages
+    return gapi.client.gmail.users.messages
       .get({
         id: mailId,
         userId: userId,
         prettyPrint: true,
       })
       .then((res) => {
-        response = res;
+        return res.result;
       })
       .catch((err) => {
         throw err.result.error;
       });
-
-    return response.result;
   }
 }
