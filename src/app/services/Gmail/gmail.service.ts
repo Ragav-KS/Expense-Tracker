@@ -46,6 +46,12 @@ export class GmailService {
     });
   }
 
+  public setToken(token: string) {
+    gapi.client.setToken({
+      access_token: token,
+    });
+  }
+
   async login() {
     let userID = await this.prefSrv.get('userID');
 
