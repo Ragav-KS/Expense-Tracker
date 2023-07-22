@@ -1,9 +1,6 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import format from 'date-fns/format';
-import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { get } from 'scriptjs';
-import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
-import { PreferenceStoreService } from '../Storage/preference-store.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,16 +8,6 @@ import { PreferenceStoreService } from '../Storage/preference-store.service';
 export class GmailService {
   private discoveryDoc: string =
     'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest';
-
-  private accessToken!: string;
-
-  private gapiLoaded = false;
-  private gapiLoadedEmitter = new EventEmitter<void>();
-
-  public loggedIn = new BehaviorSubject<boolean>(false);
-  public loginEmitter = new EventEmitter<void>();
-
-  constructor(private prefSrv: PreferenceStoreService) {}
 
   public async initialize() {
     return this.loadScript().then(() => {
@@ -60,39 +47,6 @@ export class GmailService {
     gapi.client.setToken({
       access_token: token,
     });
-  }
-
-  async login() {
-    let userID = await this.prefSrv.get('userID');
-
-    await this.loadToken(userID);
-
-    userID = await this.getUserID();
-
-    console.info(`>>>> [GAuth] logged in as ${userID}`);
-    await this.prefSrv.set('userID', userID);
-  }
-
-  private async loadToken(account?: string) {
-    await GoogleAuth.getToken({
-      selectedAccount: account,
-    }).then((result) => {
-      this.accessToken = result.token;
-    });
-
-    console.log('>>>> [GAuth] got access token');
-
-    gapi.client.setToken({
-      access_token: this.accessToken,
-    });
-
-    this.loggedIn.next(true);
-    this.loginEmitter.emit();
-
-    if (!this.gapiLoaded) {
-      console.info('>>>> [GAuth] Waiting for Gapi Client');
-      await firstValueFrom(this.gapiLoadedEmitter);
-    }
   }
 
   public async getUserID(): Promise<string> {
