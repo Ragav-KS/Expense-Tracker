@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
 import {
   Actions,
   ROOT_EFFECTS_INIT,
   createEffect,
   ofType,
 } from '@ngrx/effects';
-import { concatMap, map, of, switchMap } from 'rxjs';
+import { concatMap, filter, map, of, switchMap, takeWhile } from 'rxjs';
 import { GoogleAuth } from 'src/app/plugins/GoogleAuth';
 import { GmailService } from 'src/app/services/Gmail/gmail.service';
 import { PreferenceStoreService } from 'src/app/services/Storage/preference-store.service';
-import { login, setLoginState } from './gauth.actions';
 import { setAppLoadStatus } from '../settings/setting.actions';
+import { login, setLoginState } from './gauth.actions';
 
 @Injectable()
 export class GAuthEffects {
@@ -51,6 +52,18 @@ export class GAuthEffects {
       map((loggedInAccount) => {
         return setLoginState({ loggedIn: true, account: loggedInAccount });
       })
+    )
+  );
+
+  autoLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(setAppLoadStatus),
+      filter((loadingStatus) => loadingStatus.googleScripts === 'Loaded'),
+      concatMap(() => this.prefSrv.get('userID')),
+      takeWhile(
+        (account) => account !== null && Capacitor.getPlatform() !== 'web'
+      ),
+      map((account) => login({ account: account }))
     )
   );
 }
