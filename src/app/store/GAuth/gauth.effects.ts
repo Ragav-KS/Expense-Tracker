@@ -66,4 +66,16 @@ export class GAuthEffects {
       map((account) => login({ account: account }))
     )
   );
+
+  saveLoginState$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(setLoginState),
+        takeWhile((val) => val.loggedIn === true),
+        concatMap(({ account }) => {
+          return this.prefSrv.set('userID', account);
+        })
+      ),
+    { dispatch: false }
+  );
 }
