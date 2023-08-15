@@ -1,8 +1,16 @@
 import { createReducer, on } from '@ngrx/store';
-import { setDateRange, setLastSyncDate } from './setting.actions';
+import {
+  setAppLoadStatus,
+  setDateRange,
+  setLastSyncDate,
+} from './setting.actions';
 import { monthStart } from './setting.util';
 
+export type loadItem = 'googleScripts';
+export type LoadStatus = 'Not Loaded' | 'Loading' | 'Failed' | 'Loaded';
+
 export interface SettingStore {
+  appLoadStatus: Record<loadItem, LoadStatus>;
   dateRange: {
     start: Date;
     end: Date;
@@ -12,6 +20,9 @@ export interface SettingStore {
 }
 
 export const initialState: SettingStore = {
+  appLoadStatus: {
+    googleScripts: 'Not Loaded',
+  },
   dateRange: {
     start: monthStart(),
     end: new Date(),
@@ -48,6 +59,14 @@ export const settingReducer = createReducer(
           },
         });
     }
+  }),
+  on(setAppLoadStatus, (state, loadStatus) => {
+    return Object.assign({}, state, {
+      appLoadStatus: {
+        ...state.appLoadStatus,
+        ...loadStatus,
+      },
+    });
   }),
   on(setLastSyncDate, (state, { date }) => ({ ...state, lastSync: date }))
 );
