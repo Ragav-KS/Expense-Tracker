@@ -26,7 +26,7 @@ import { TransactionEffects } from './store/transaction/transaction.effects';
     StoreDevtoolsModule.instrument({
       logOnly: !isDevMode(),
       trace: true,
-    }),
+    connectInZone: true}),
     EffectsModule.forRoot([
       TransactionEffects,
       SettingEffects,
