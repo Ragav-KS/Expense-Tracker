@@ -40,11 +40,11 @@ export class AppComponent {
         await this.sqliteSrv.initializeDB();
       });
 
-      if (platform !== 'web') {
-        if (await this.prefSrv.get('userID')) {
-          await this.gmailSrv.login();
-        }
-      }
+      // if (platform !== 'web') {
+      //   if (await this.prefSrv.get('userID')) {
+      //     await this.gmailSrv.login();
+      //   }
+      // }
     });
   }
 
