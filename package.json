@@ -59,7 +59,7 @@
     "@angular/language-service": "^17.3.6",
     "@capacitor/assets": "^2.0.4",
     "@capacitor/cli": "^5.0.0",
-    "@ionic/angular-toolkit": "^9.0.0",
+    "@ionic/angular-toolkit": "11.0.1",
     "@ngrx/eslint-plugin": "^17.2.0",
     "@types/jasmine": "4.3.4",
     "@types/lodash-es": "^4.17.7",
